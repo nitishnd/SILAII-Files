@@ -1,0 +1,628 @@
+{% doc %}
+  @prompt
+    this a featured single product page for the Movie Merchandise product, need persuasive  layout with limited edition 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-limited-product-{{ ai_gen_id }} {
+    background: {{ block.settings.background_color }};
+    padding: 40px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-limited-product-container-{{ ai_gen_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+
+  .ai-limited-product-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+  }
+
+  .ai-limited-product-badge-{{ ai_gen_id }} {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: {{ block.settings.badge_bg_color }};
+    color: {{ block.settings.badge_text_color }};
+    padding: 12px 24px;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-radius: 4px;
+    z-index: 2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-limited-product-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  }
+
+  .ai-limited-product-image-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f4f4f4;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+
+  .ai-limited-product-image-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 300px;
+    max-height: 300px;
+    opacity: 0.3;
+  }
+
+  .ai-limited-product-empty-state-{{ ai_gen_id }} {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+  }
+
+  .ai-limited-product-content-{{ ai_gen_id }} {
+    padding: 20px 0;
+  }
+
+  .ai-limited-product-eyebrow-{{ ai_gen_id }} {
+    color: {{ block.settings.eyebrow_color }};
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .ai-limited-product-title-{{ ai_gen_id }} {
+    color: {{ block.settings.title_color }};
+    font-size: {{ block.settings.title_size }}px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0 0 16px;
+  }
+
+  .ai-limited-product-subtitle-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 18px;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+
+  .ai-limited-product-description-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .ai-limited-product-features-{{ ai_gen_id }} {
+    margin-bottom: 32px;
+  }
+
+  .ai-limited-product-feature-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    color: {{ block.settings.text_color }};
+    font-size: 15px;
+  }
+
+  .ai-limited-product-feature-icon-{{ ai_gen_id }} {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: {{ block.settings.accent_color }};
+  }
+
+  .ai-limited-product-urgency-{{ ai_gen_id }} {
+    background: {{ block.settings.urgency_bg_color }};
+    border-left: 4px solid {{ block.settings.accent_color }};
+    padding: 16px 20px;
+    margin-bottom: 32px;
+    border-radius: 4px;
+  }
+
+  .ai-limited-product-urgency-text-{{ ai_gen_id }} {
+    color: {{ block.settings.urgency_text_color }};
+    font-size: 15px;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .ai-limited-product-price-wrapper-{{ ai_gen_id }} {
+    margin-bottom: 32px;
+  }
+
+  .ai-limited-product-price-{{ ai_gen_id }} {
+    color: {{ block.settings.price_color }};
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .ai-limited-product-price-note-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 14px;
+    opacity: 0.8;
+  }
+
+  .ai-limited-product-cta-{{ ai_gen_id }} {
+    display: inline-block;
+    background: {{ block.settings.button_bg_color }};
+    color: {{ block.settings.button_text_color }};
+    padding: 18px 48px;
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-limited-product-cta-{{ ai_gen_id }}:hover {
+    background: {{ block.settings.button_hover_bg_color }};
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .ai-limited-product-guarantee-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+    color: {{ block.settings.text_color }};
+    font-size: 14px;
+  }
+
+  .ai-limited-product-guarantee-icon-{{ ai_gen_id }} {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+    color: {{ block.settings.accent_color }};
+  }
+
+  @media screen and (max-width: 768px) {
+    .ai-limited-product-container-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .ai-limited-product-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.7 }}px;
+    }
+
+    .ai-limited-product-price-{{ ai_gen_id }} {
+      font-size: 28px;
+    }
+
+    .ai-limited-product-cta-{{ ai_gen_id }} {
+      width: 100%;
+      text-align: center;
+    }
+
+    .ai-limited-product-badge-{{ ai_gen_id }} {
+      top: 10px;
+      right: 10px;
+      padding: 8px 16px;
+      font-size: 12px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-limited-product-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-limited-product-container-{{ ai_gen_id }}">
+    <div class="ai-limited-product-image-wrapper-{{ ai_gen_id }}">
+      {% if block.settings.show_badge %}
+        <div class="ai-limited-product-badge-{{ ai_gen_id }}">
+          {{ block.settings.badge_text }}
+        </div>
+      {% endif %}
+
+      {% if block.settings.product %}
+        {% if block.settings.product.featured_image %}
+          <img
+            src="{{ block.settings.product.featured_image | image_url: width: 1200 }}"
+            alt="{{ block.settings.product.featured_image.alt | escape }}"
+            class="ai-limited-product-image-{{ ai_gen_id }}"
+            loading="lazy"
+            width="{{ block.settings.product.featured_image.width }}"
+            height="{{ block.settings.product.featured_image.height }}"
+          >
+        {% else %}
+          <div class="ai-limited-product-image-placeholder-{{ ai_gen_id }}">
+            {{ 'product-1' | placeholder_svg_tag }}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="ai-limited-product-image-placeholder-{{ ai_gen_id }}">
+          {{ 'product-1' | placeholder_svg_tag }}
+          <div class="ai-limited-product-empty-state-{{ ai_gen_id }}">
+            Next, select a product
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="ai-limited-product-content-{{ ai_gen_id }}">
+      {% if block.settings.eyebrow_text != blank %}
+        <div class="ai-limited-product-eyebrow-{{ ai_gen_id }}">
+          {{ block.settings.eyebrow_text }}
+        </div>
+      {% endif %}
+
+      {% if block.settings.product %}
+        <h2 class="ai-limited-product-title-{{ ai_gen_id }}">
+          {{ block.settings.product.title }}
+        </h2>
+      {% else %}
+        <h2 class="ai-limited-product-title-{{ ai_gen_id }}">
+          {{ block.settings.custom_title }}
+        </h2>
+      {% endif %}
+
+      {% if block.settings.subtitle != blank %}
+        <div class="ai-limited-product-subtitle-{{ ai_gen_id }}">
+          {{ block.settings.subtitle }}
+        </div>
+      {% endif %}
+
+      {% if block.settings.description != blank %}
+        <div class="ai-limited-product-description-{{ ai_gen_id }}">
+          {{ block.settings.description }}
+        </div>
+      {% endif %}
+
+      {% if block.settings.show_features %}
+        <div class="ai-limited-product-features-{{ ai_gen_id }}">
+          {% if block.settings.feature_1 != blank %}
+            <div class="ai-limited-product-feature-{{ ai_gen_id }}">
+              <svg class="ai-limited-product-feature-icon-{{ ai_gen_id }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{{ block.settings.feature_1 }}</span>
+            </div>
+          {% endif %}
+
+          {% if block.settings.feature_2 != blank %}
+            <div class="ai-limited-product-feature-{{ ai_gen_id }}">
+              <svg class="ai-limited-product-feature-icon-{{ ai_gen_id }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{{ block.settings.feature_2 }}</span>
+            </div>
+          {% endif %}
+
+          {% if block.settings.feature_3 != blank %}
+            <div class="ai-limited-product-feature-{{ ai_gen_id }}">
+              <svg class="ai-limited-product-feature-icon-{{ ai_gen_id }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+              <span>{{ block.settings.feature_3 }}</span>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if block.settings.show_urgency and block.settings.urgency_text != blank %}
+        <div class="ai-limited-product-urgency-{{ ai_gen_id }}">
+          <p class="ai-limited-product-urgency-text-{{ ai_gen_id }}">
+            {{ block.settings.urgency_text }}
+          </p>
+        </div>
+      {% endif %}
+
+      <div class="ai-limited-product-price-wrapper-{{ ai_gen_id }}">
+        {% if block.settings.product %}
+          <div class="ai-limited-product-price-{{ ai_gen_id }}">
+            {{ block.settings.product.price | money }}
+          </div>
+        {% else %}
+          <div class="ai-limited-product-price-{{ ai_gen_id }}">
+            {{ block.settings.custom_price }}
+          </div>
+        {% endif %}
+
+        {% if block.settings.price_note != blank %}
+          <div class="ai-limited-product-price-note-{{ ai_gen_id }}">
+            {{ block.settings.price_note }}
+          </div>
+        {% endif %}
+      </div>
+
+      {% if block.settings.product %}
+        <a href="{{ block.settings.product.url }}" class="ai-limited-product-cta-{{ ai_gen_id }}">
+          {{ block.settings.button_text }}
+        </a>
+      {% else %}
+        <a href="{{ block.settings.button_link }}" class="ai-limited-product-cta-{{ ai_gen_id }}">
+          {{ block.settings.button_text }}
+        </a>
+      {% endif %}
+
+      {% if block.settings.show_guarantee and block.settings.guarantee_text != blank %}
+        <div class="ai-limited-product-guarantee-{{ ai_gen_id }}">
+          <svg class="ai-limited-product-guarantee-icon-{{ ai_gen_id }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+          </svg>
+          <span>{{ block.settings.guarantee_text }}</span>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Limited edition product",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Product"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product"
+    },
+    {
+      "type": "text",
+      "id": "custom_title",
+      "label": "Custom title",
+      "default": "Exclusive Movie Merchandise"
+    },
+    {
+      "type": "text",
+      "id": "custom_price",
+      "label": "Custom price display"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow_text",
+      "label": "Eyebrow text",
+      "default": "Exclusive Collection"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Official Licensed Merchandise"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Own a piece of cinematic history with this exclusive limited edition collectible. Meticulously crafted for true fans and collectors."
+    },
+    {
+      "type": "header",
+      "content": "Badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Show badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge text",
+      "default": "Limited Edition"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg_color",
+      "label": "Badge background",
+      "default": "#c20000"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_features",
+      "label": "Show features",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "feature_1",
+      "label": "Feature 1",
+      "default": "Officially licensed and authenticated"
+    },
+    {
+      "type": "text",
+      "id": "feature_2",
+      "label": "Feature 2",
+      "default": "Numbered certificate of authenticity"
+    },
+    {
+      "type": "text",
+      "id": "feature_3",
+      "label": "Feature 3",
+      "default": "Premium collector's packaging"
+    },
+    {
+      "type": "header",
+      "content": "Urgency message"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show urgency message",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "urgency_text",
+      "label": "Urgency text",
+      "default": "Only 500 pieces worldwide - Once sold out, never to be reproduced"
+    },
+    {
+      "type": "color",
+      "id": "urgency_bg_color",
+      "label": "Background",
+      "default": "#fff8e1"
+    },
+    {
+      "type": "color",
+      "id": "urgency_text_color",
+      "label": "Text",
+      "default": "#171717"
+    },
+    {
+      "type": "header",
+      "content": "Price"
+    },
+    {
+      "type": "text",
+      "id": "price_note",
+      "label": "Price note",
+      "default": "Free worldwide shipping included"
+    },
+    {
+      "type": "header",
+      "content": "Call to action"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Reserve Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button background",
+      "default": "#c16452"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg_color",
+      "label": "Button hover background",
+      "default": "#b61d0f"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Guarantee"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_guarantee",
+      "label": "Show guarantee",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "guarantee_text",
+      "label": "Guarantee text",
+      "default": "100% Authenticity Guarantee or Money Back"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Eyebrow text",
+      "default": "#c16452"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Price",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent",
+      "default": "#c16452"
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 42
+    }
+  ],
+  "presets": [
+    {
+      "name": "Limited edition product"
+    }
+  ]
+}
+{% endschema %}

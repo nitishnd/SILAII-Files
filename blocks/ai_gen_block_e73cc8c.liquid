@@ -1,0 +1,538 @@
+{% doc %}
+  @prompt
+    want to create movie merchandise  single feature product layout
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-movie-merch-{{ ai_gen_id }} {
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.section_padding }}px 20px;
+  }
+
+  .ai-movie-merch-container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: {{ block.settings.grid_gap }}px;
+    align-items: center;
+  }
+
+  .ai-movie-merch-image-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+  }
+
+  .ai-movie-merch-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    border-radius: {{ block.settings.image_border_radius }}px;
+    overflow: hidden;
+    background-color: #f4f4f4;
+  }
+
+  .ai-movie-merch-image-wrapper-{{ ai_gen_id }} img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .ai-movie-merch-badge-{{ ai_gen_id }} {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: {{ block.settings.badge_bg_color }};
+    color: {{ block.settings.badge_text_color }};
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    z-index: 2;
+  }
+
+  .ai-movie-merch-content-{{ ai_gen_id }} {
+    padding: 0 20px;
+  }
+
+  .ai-movie-merch-category-{{ ai_gen_id }} {
+    color: {{ block.settings.category_color }};
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .ai-movie-merch-title-{{ ai_gen_id }} {
+    color: {{ block.settings.title_color }};
+    font-size: {{ block.settings.title_size }}px;
+    margin: 0 0 16px;
+    line-height: 1.2;
+  }
+
+  .ai-movie-merch-description-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.text_size }}px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .ai-movie-merch-price-{{ ai_gen_id }} {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .ai-movie-merch-price-current-{{ ai_gen_id }} {
+    color: {{ block.settings.price_color }};
+    font-size: {{ block.settings.price_size }}px;
+    font-weight: 700;
+  }
+
+  .ai-movie-merch-price-original-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.text_size }}px;
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+
+  .ai-movie-merch-features-{{ ai_gen_id }} {
+    margin-bottom: 32px;
+  }
+
+  .ai-movie-merch-feature-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .ai-movie-merch-feature-icon-{{ ai_gen_id }} {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: {{ block.settings.feature_icon_color }};
+  }
+
+  .ai-movie-merch-feature-text-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+    font-size: 14px;
+  }
+
+  .ai-movie-merch-cta-{{ ai_gen_id }} {
+    display: inline-block;
+    background-color: {{ block.settings.button_bg_color }};
+    color: {{ block.settings.button_text_color }};
+    padding: 16px 40px;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+  }
+
+  .ai-movie-merch-cta-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_bg_color }};
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  @media screen and (max-width: 768px) {
+    .ai-movie-merch-container-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+
+    .ai-movie-merch-content-{{ ai_gen_id }} {
+      padding: 0;
+    }
+
+    .ai-movie-merch-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.8 }}px;
+    }
+
+    .ai-movie-merch-cta-{{ ai_gen_id }} {
+      width: 100%;
+      text-align: center;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-movie-merch-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-movie-merch-container-{{ ai_gen_id }}">
+    <div class="ai-movie-merch-image-{{ ai_gen_id }}">
+      <div class="ai-movie-merch-image-wrapper-{{ ai_gen_id }}">
+        {% if block.settings.product_image %}
+          <img
+            src="{{ block.settings.product_image | image_url: width: 1200 }}"
+            alt="{{ block.settings.product_image.alt | escape }}"
+            loading="lazy"
+            width="{{ block.settings.product_image.width }}"
+            height="{{ block.settings.product_image.height }}"
+          >
+        {% else %}
+          {{ 'product-1' | placeholder_svg_tag }}
+        {% endif %}
+      </div>
+      {% if block.settings.show_badge and block.settings.badge_text != blank %}
+        <div class="ai-movie-merch-badge-{{ ai_gen_id }}">
+          {{ block.settings.badge_text }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="ai-movie-merch-content-{{ ai_gen_id }}">
+      {% if block.settings.category_text != blank %}
+        <div class="ai-movie-merch-category-{{ ai_gen_id }}">
+          {{ block.settings.category_text }}
+        </div>
+      {% endif %}
+
+      {% if block.settings.product_title != blank %}
+        <h2 class="ai-movie-merch-title-{{ ai_gen_id }}">
+          {{ block.settings.product_title }}
+        </h2>
+      {% endif %}
+
+      {% if block.settings.product_description != blank %}
+        <div class="ai-movie-merch-description-{{ ai_gen_id }}">
+          {{ block.settings.product_description }}
+        </div>
+      {% endif %}
+
+      {% if block.settings.show_price %}
+        <div class="ai-movie-merch-price-{{ ai_gen_id }}">
+          <span class="ai-movie-merch-price-current-{{ ai_gen_id }}">
+            {{ block.settings.current_price }}
+          </span>
+          {% if block.settings.original_price != blank %}
+            <span class="ai-movie-merch-price-original-{{ ai_gen_id }}">
+              {{ block.settings.original_price }}
+            </span>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if block.settings.show_features %}
+        <div class="ai-movie-merch-features-{{ ai_gen_id }}">
+          {% if block.settings.feature_1 != blank %}
+            <div class="ai-movie-merch-feature-{{ ai_gen_id }}">
+              <svg class="ai-movie-merch-feature-icon-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span class="ai-movie-merch-feature-text-{{ ai_gen_id }}">{{ block.settings.feature_1 }}</span>
+            </div>
+          {% endif %}
+          {% if block.settings.feature_2 != blank %}
+            <div class="ai-movie-merch-feature-{{ ai_gen_id }}">
+              <svg class="ai-movie-merch-feature-icon-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span class="ai-movie-merch-feature-text-{{ ai_gen_id }}">{{ block.settings.feature_2 }}</span>
+            </div>
+          {% endif %}
+          {% if block.settings.feature_3 != blank %}
+            <div class="ai-movie-merch-feature-{{ ai_gen_id }}">
+              <svg class="ai-movie-merch-feature-icon-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span class="ai-movie-merch-feature-text-{{ ai_gen_id }}">{{ block.settings.feature_3 }}</span>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if block.settings.button_text != blank %}
+        <a href="{{ block.settings.button_link }}" class="ai-movie-merch-cta-{{ ai_gen_id }}">
+          {{ block.settings.button_text }}
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Movie merchandise feature",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Product image"
+    },
+    {
+      "type": "image_picker",
+      "id": "product_image",
+      "label": "Image"
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Show badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge text",
+      "default": "Limited Edition"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg_color",
+      "label": "Background",
+      "default": "#c20000"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "category_text",
+      "label": "Category",
+      "default": "Official Merchandise"
+    },
+    {
+      "type": "text",
+      "id": "product_title",
+      "label": "Title",
+      "default": "Baahubali Collector's Edition Statue"
+    },
+    {
+      "type": "textarea",
+      "id": "product_description",
+      "label": "Description",
+      "default": "Own a piece of cinematic history with this meticulously crafted collectible. Perfect for fans and collectors alike."
+    },
+    {
+      "type": "header",
+      "content": "Price"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show price",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "current_price",
+      "label": "Current price",
+      "default": "₹4,999"
+    },
+    {
+      "type": "text",
+      "id": "original_price",
+      "label": "Original price"
+    },
+    {
+      "type": "header",
+      "content": "Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_features",
+      "label": "Show features",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "feature_1",
+      "label": "Feature 1",
+      "default": "Officially licensed merchandise"
+    },
+    {
+      "type": "text",
+      "id": "feature_2",
+      "label": "Feature 2",
+      "default": "Hand-painted details"
+    },
+    {
+      "type": "text",
+      "id": "feature_3",
+      "label": "Feature 3",
+      "default": "Limited edition collectible"
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Text",
+      "default": "Shop Now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Link"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Background",
+      "default": "#c16452"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg_color",
+      "label": "Hover background",
+      "default": "#b61d0f"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "category_color",
+      "label": "Category",
+      "default": "#c16452"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Price",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "feature_icon_color",
+      "label": "Feature icon",
+      "default": "#c16452"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 50,
+      "unit": "px",
+      "label": "Maximum width",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Section padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "grid_gap",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Grid gap",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "price_size",
+      "min": 20,
+      "max": 50,
+      "step": 2,
+      "unit": "px",
+      "label": "Price size",
+      "default": 32
+    }
+  ],
+  "presets": [
+    {
+      "name": "Movie merchandise feature"
+    }
+  ]
+}
+{% endschema %}

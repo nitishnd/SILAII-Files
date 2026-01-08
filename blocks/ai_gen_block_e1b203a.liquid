@@ -1,0 +1,766 @@
+{% doc %}
+  @prompt
+    page last layout featuring about the store information like free delivery, secured payment. and give me some creative closing CTA layout 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-footer-features-{{ ai_gen_id }} {
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.section_padding }}px 20px;
+  }
+
+  .ai-footer-features__container-{{ ai_gen_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .ai-footer-features__grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    margin-bottom: {{ block.settings.cta_spacing }}px;
+  }
+
+  .ai-footer-feature-{{ ai_gen_id }} {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ai-footer-feature__icon-{{ ai_gen_id }} {
+    width: {{ block.settings.icon_size }}px;
+    height: {{ block.settings.icon_size }}px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: {{ block.settings.icon_background }};
+    border-radius: 50%;
+    padding: 16px;
+  }
+
+  .ai-footer-feature__icon-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    stroke: {{ block.settings.icon_color }};
+    fill: none;
+  }
+
+  .ai-footer-feature__title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    font-weight: 600;
+    color: {{ block.settings.title_color }};
+    margin: 0;
+  }
+
+  .ai-footer-feature__text-{{ ai_gen_id }} {
+    font-size: {{ block.settings.text_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  .ai-footer-cta-{{ ai_gen_id }} {
+    {% if block.settings.cta_layout == 'split' %}
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      align-items: center;
+    {% elsif block.settings.cta_layout == 'centered' %}
+      text-align: center;
+      max-width: 600px;
+      margin: 0 auto;
+    {% elsif block.settings.cta_layout == 'wave' %}
+      position: relative;
+      background: linear-gradient(135deg, {{ block.settings.cta_bg_color }} 0%, {{ block.settings.cta_bg_color }}dd 100%);
+      padding: 60px 40px;
+      border-radius: 20px;
+      overflow: hidden;
+      text-align: center;
+    {% endif %}
+  }
+
+  {% if block.settings.cta_layout == 'wave' %}
+    .ai-footer-cta-{{ ai_gen_id }}::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -10%;
+      width: 120%;
+      height: 200%;
+      background: radial-gradient(circle, {{ block.settings.cta_accent_color }}22 0%, transparent 70%);
+      animation: ai-wave-{{ ai_gen_id }} 15s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes ai-wave-{{ ai_gen_id }} {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(5deg); }
+    }
+  {% endif %}
+
+  .ai-footer-cta__content-{{ ai_gen_id }} {
+    {% if block.settings.cta_layout == 'wave' %}
+      position: relative;
+      z-index: 1;
+    {% endif %}
+  }
+
+  .ai-footer-cta__heading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.cta_heading_size }}px;
+    font-weight: 700;
+    color: {{ block.settings.cta_heading_color }};
+    margin: 0 0 12px;
+    line-height: 1.2;
+  }
+
+  .ai-footer-cta__text-{{ ai_gen_id }} {
+    font-size: {{ block.settings.cta_text_size }}px;
+    color: {{ block.settings.cta_text_color }};
+    margin: 0 0 24px;
+    line-height: 1.6;
+  }
+
+  .ai-footer-cta__buttons-{{ ai_gen_id }} {
+    display: flex;
+    gap: 16px;
+    {% if block.settings.cta_layout == 'centered' or block.settings.cta_layout == 'wave' %}
+      justify-content: center;
+    {% endif %}
+    flex-wrap: wrap;
+  }
+
+  .ai-footer-cta__button-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 28px;
+    background-color: {{ block.settings.button_bg_color }};
+    color: {{ block.settings.button_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.button_radius }}px;
+    font-weight: 600;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+  }
+
+  .ai-footer-cta__button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_bg }};
+    color: {{ block.settings.button_hover_text }};
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-footer-cta__button--secondary-{{ ai_gen_id }} {
+    background-color: transparent;
+    color: {{ block.settings.button_secondary_color }};
+    border: 2px solid {{ block.settings.button_secondary_color }};
+  }
+
+  .ai-footer-cta__button--secondary-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_secondary_color }};
+    color: {{ block.settings.button_bg_color }};
+  }
+
+  .ai-footer-cta__image-{{ ai_gen_id }} {
+    {% if block.settings.cta_layout == 'split' %}
+      width: 100%;
+      height: 300px;
+      border-radius: 12px;
+      overflow: hidden;
+    {% endif %}
+  }
+
+  .ai-footer-cta__image-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media screen and (max-width: 768px) {
+    .ai-footer-features__grid-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    .ai-footer-cta-{{ ai_gen_id }} {
+      {% if block.settings.cta_layout == 'split' %}
+        grid-template-columns: 1fr;
+      {% endif %}
+    }
+
+    .ai-footer-cta__buttons-{{ ai_gen_id }} {
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .ai-footer-cta__button-{{ ai_gen_id }} {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .ai-footer-cta__heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.cta_heading_size | times: 0.8 }}px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-footer-features-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-footer-features__container-{{ ai_gen_id }}">
+    <div class="ai-footer-features__grid-{{ ai_gen_id }}">
+      {% if block.settings.feature_1_enabled %}
+        <div class="ai-footer-feature-{{ ai_gen_id }}">
+          <div class="ai-footer-feature__icon-{{ ai_gen_id }}">
+            {% if block.settings.feature_1_icon == 'shipping' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+              </svg>
+            {% elsif block.settings.feature_1_icon == 'lock' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            {% elsif block.settings.feature_1_icon == 'return' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
+            {% elsif block.settings.feature_1_icon == 'support' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            {% endif %}
+          </div>
+          <h3 class="ai-footer-feature__title-{{ ai_gen_id }}">{{ block.settings.feature_1_title }}</h3>
+          <p class="ai-footer-feature__text-{{ ai_gen_id }}">{{ block.settings.feature_1_text }}</p>
+        </div>
+      {% endif %}
+
+      {% if block.settings.feature_2_enabled %}
+        <div class="ai-footer-feature-{{ ai_gen_id }}">
+          <div class="ai-footer-feature__icon-{{ ai_gen_id }}">
+            {% if block.settings.feature_2_icon == 'shipping' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+              </svg>
+            {% elsif block.settings.feature_2_icon == 'lock' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            {% elsif block.settings.feature_2_icon == 'return' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
+            {% elsif block.settings.feature_2_icon == 'support' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            {% endif %}
+          </div>
+          <h3 class="ai-footer-feature__title-{{ ai_gen_id }}">{{ block.settings.feature_2_title }}</h3>
+          <p class="ai-footer-feature__text-{{ ai_gen_id }}">{{ block.settings.feature_2_text }}</p>
+        </div>
+      {% endif %}
+
+      {% if block.settings.feature_3_enabled %}
+        <div class="ai-footer-feature-{{ ai_gen_id }}">
+          <div class="ai-footer-feature__icon-{{ ai_gen_id }}">
+            {% if block.settings.feature_3_icon == 'shipping' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+              </svg>
+            {% elsif block.settings.feature_3_icon == 'lock' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            {% elsif block.settings.feature_3_icon == 'return' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
+            {% elsif block.settings.feature_3_icon == 'support' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            {% endif %}
+          </div>
+          <h3 class="ai-footer-feature__title-{{ ai_gen_id }}">{{ block.settings.feature_3_title }}</h3>
+          <p class="ai-footer-feature__text-{{ ai_gen_id }}">{{ block.settings.feature_3_text }}</p>
+        </div>
+      {% endif %}
+
+      {% if block.settings.feature_4_enabled %}
+        <div class="ai-footer-feature-{{ ai_gen_id }}">
+          <div class="ai-footer-feature__icon-{{ ai_gen_id }}">
+            {% if block.settings.feature_4_icon == 'shipping' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="1" y="3" width="15" height="13"></rect>
+                <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                <circle cx="18.5" cy="18.5" r="2.5"></circle>
+              </svg>
+            {% elsif block.settings.feature_4_icon == 'lock' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            {% elsif block.settings.feature_4_icon == 'return' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="1 4 1 10 7 10"></polyline>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+              </svg>
+            {% elsif block.settings.feature_4_icon == 'support' %}
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            {% endif %}
+          </div>
+          <h3 class="ai-footer-feature__title-{{ ai_gen_id }}">{{ block.settings.feature_4_title }}</h3>
+          <p class="ai-footer-feature__text-{{ ai_gen_id }}">{{ block.settings.feature_4_text }}</p>
+        </div>
+      {% endif %}
+    </div>
+
+    {% if block.settings.show_cta %}
+      <div class="ai-footer-cta-{{ ai_gen_id }}">
+        {% if block.settings.cta_layout == 'split' and block.settings.cta_image %}
+          <div class="ai-footer-cta__image-{{ ai_gen_id }}">
+            <img
+              src="{{ block.settings.cta_image | image_url: width: 600 }}"
+              alt="{{ block.settings.cta_image.alt | escape }}"
+              loading="lazy"
+              width="600"
+              height="300"
+            >
+          </div>
+        {% endif %}
+
+        <div class="ai-footer-cta__content-{{ ai_gen_id }}">
+          {% if block.settings.cta_heading != blank %}
+            <h2 class="ai-footer-cta__heading-{{ ai_gen_id }}">{{ block.settings.cta_heading }}</h2>
+          {% endif %}
+          {% if block.settings.cta_text != blank %}
+            <p class="ai-footer-cta__text-{{ ai_gen_id }}">{{ block.settings.cta_text }}</p>
+          {% endif %}
+          <div class="ai-footer-cta__buttons-{{ ai_gen_id }}">
+            {% if block.settings.cta_button_1_text != blank %}
+              <a href="{{ block.settings.cta_button_1_link }}" class="ai-footer-cta__button-{{ ai_gen_id }}">
+                {{ block.settings.cta_button_1_text }}
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </a>
+            {% endif %}
+            {% if block.settings.cta_button_2_text != blank %}
+              <a href="{{ block.settings.cta_button_2_link }}" class="ai-footer-cta__button-{{ ai_gen_id }} ai-footer-cta__button--secondary-{{ ai_gen_id }}">
+                {{ block.settings.cta_button_2_text }}
+              </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Footer features and CTA",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section style"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ebe7e3"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding",
+      "default": 60
+    },
+    {
+      "type": "header",
+      "content": "Feature 1"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_1_enabled",
+      "label": "Enable feature 1",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "feature_1_icon",
+      "label": "Icon",
+      "options": [
+        { "value": "shipping", "label": "Free shipping" },
+        { "value": "lock", "label": "Secure payment" },
+        { "value": "return", "label": "Easy returns" },
+        { "value": "support", "label": "24/7 support" }
+      ],
+      "default": "shipping"
+    },
+    {
+      "type": "text",
+      "id": "feature_1_title",
+      "label": "Title",
+      "default": "Free delivery"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_1_text",
+      "label": "Text",
+      "default": "On all orders over ₹2,000"
+    },
+    {
+      "type": "header",
+      "content": "Feature 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_2_enabled",
+      "label": "Enable feature 2",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "feature_2_icon",
+      "label": "Icon",
+      "options": [
+        { "value": "shipping", "label": "Free shipping" },
+        { "value": "lock", "label": "Secure payment" },
+        { "value": "return", "label": "Easy returns" },
+        { "value": "support", "label": "24/7 support" }
+      ],
+      "default": "lock"
+    },
+    {
+      "type": "text",
+      "id": "feature_2_title",
+      "label": "Title",
+      "default": "Secured payment"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_2_text",
+      "label": "Text",
+      "default": "100% secure transactions"
+    },
+    {
+      "type": "header",
+      "content": "Feature 3"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_3_enabled",
+      "label": "Enable feature 3",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "feature_3_icon",
+      "label": "Icon",
+      "options": [
+        { "value": "shipping", "label": "Free shipping" },
+        { "value": "lock", "label": "Secure payment" },
+        { "value": "return", "label": "Easy returns" },
+        { "value": "support", "label": "24/7 support" }
+      ],
+      "default": "return"
+    },
+    {
+      "type": "text",
+      "id": "feature_3_title",
+      "label": "Title",
+      "default": "Easy returns"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_3_text",
+      "label": "Text",
+      "default": "30-day return policy"
+    },
+    {
+      "type": "header",
+      "content": "Feature 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_4_enabled",
+      "label": "Enable feature 4",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "feature_4_icon",
+      "label": "Icon",
+      "options": [
+        { "value": "shipping", "label": "Free shipping" },
+        { "value": "lock", "label": "Secure payment" },
+        { "value": "return", "label": "Easy returns" },
+        { "value": "support", "label": "24/7 support" }
+      ],
+      "default": "support"
+    },
+    {
+      "type": "text",
+      "id": "feature_4_title",
+      "label": "Title",
+      "default": "24/7 support"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_4_text",
+      "label": "Text",
+      "default": "Dedicated customer service"
+    },
+    {
+      "type": "header",
+      "content": "Feature style"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 40,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Icon size",
+      "default": 60
+    },
+    {
+      "type": "color",
+      "id": "icon_background",
+      "label": "Icon background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "icon_color",
+      "label": "Icon color",
+      "default": "#c16452"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Title size",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#050505"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "min": 12,
+      "max": 18,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#1f1f1f"
+    },
+    {
+      "type": "header",
+      "content": "Closing CTA"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cta",
+      "label": "Show CTA section",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "cta_spacing",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Spacing above CTA",
+      "default": 60
+    },
+    {
+      "type": "select",
+      "id": "cta_layout",
+      "label": "Layout",
+      "options": [
+        { "value": "centered", "label": "Centered" },
+        { "value": "split", "label": "Split with image" },
+        { "value": "wave", "label": "Wave background" }
+      ],
+      "default": "wave"
+    },
+    {
+      "type": "image_picker",
+      "id": "cta_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "cta_heading",
+      "label": "Heading",
+      "default": "Ready to start your journey?"
+    },
+    {
+      "type": "textarea",
+      "id": "cta_text",
+      "label": "Text",
+      "default": "Discover our handcrafted sculptures and bring art into your life."
+    },
+    {
+      "type": "range",
+      "id": "cta_heading_size",
+      "min": 20,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "cta_text_size",
+      "min": 14,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "cta_bg_color",
+      "label": "Background",
+      "default": "#c16452"
+    },
+    {
+      "type": "color",
+      "id": "cta_accent_color",
+      "label": "Accent color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "cta_heading_color",
+      "label": "Heading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "CTA buttons"
+    },
+    {
+      "type": "text",
+      "id": "cta_button_1_text",
+      "label": "Primary button text",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "cta_button_1_link",
+      "label": "Primary button link"
+    },
+    {
+      "type": "text",
+      "id": "cta_button_2_text",
+      "label": "Secondary button text",
+      "default": "Learn more"
+    },
+    {
+      "type": "url",
+      "id": "cta_button_2_link",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "range",
+      "id": "button_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Button border radius",
+      "default": 6
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Primary button background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Primary button text",
+      "default": "#c16452"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg",
+      "label": "Primary button hover background",
+      "default": "#f7f7f7"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text",
+      "label": "Primary button hover text",
+      "default": "#b61d0f"
+    },
+    {
+      "type": "color",
+      "id": "button_secondary_color",
+      "label": "Secondary button color",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer features and CTA"
+    }
+  ]
+}
+{% endschema %}

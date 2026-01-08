@@ -1,0 +1,440 @@
+{% doc %}
+  @prompt
+    SILAII X BAAHUBALI marquee text layout beautifully highlighted
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-marquee-container-{{ ai_gen_id }} {
+    width: 100%;
+    overflow: hidden;
+    background: {{ block.settings.background_color }};
+    padding: {{ block.settings.padding_vertical }}px 0;
+    position: relative;
+  }
+
+  .ai-marquee-container-{{ ai_gen_id }}::before,
+  .ai-marquee-container-{{ ai_gen_id }}::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .ai-marquee-container-{{ ai_gen_id }}::before {
+    left: 0;
+    background: linear-gradient(to right, {{ block.settings.background_color }}, transparent);
+  }
+
+  .ai-marquee-container-{{ ai_gen_id }}::after {
+    right: 0;
+    background: linear-gradient(to left, {{ block.settings.background_color }}, transparent);
+  }
+
+  .ai-marquee-track-{{ ai_gen_id }} {
+    display: flex;
+    width: fit-content;
+    animation: ai-marquee-scroll-{{ ai_gen_id }} {{ block.settings.animation_speed }}s linear infinite;
+  }
+
+  .ai-marquee-content-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    padding: 0 {{ block.settings.spacing }}px;
+  }
+
+  .ai-marquee-text-{{ ai_gen_id }} {
+    font-size: {{ block.settings.font_size }}px;
+    font-weight: {{ block.settings.font_weight }};
+    color: {{ block.settings.text_color }};
+    text-transform: {{ block.settings.text_transform }};
+    letter-spacing: {{ block.settings.letter_spacing }}px;
+    margin: 0;
+    padding: 0 {{ block.settings.spacing }}px;
+    position: relative;
+    display: inline-block;
+  }
+
+  {% if block.settings.highlight_style == 'gradient' %}
+    .ai-marquee-text-{{ ai_gen_id }} {
+      background: linear-gradient(
+        {{ block.settings.gradient_angle }}deg,
+        {{ block.settings.highlight_color_1 }},
+        {{ block.settings.highlight_color_2 }}
+      );
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  {% elsif block.settings.highlight_style == 'outline' %}
+    .ai-marquee-text-{{ ai_gen_id }} {
+      -webkit-text-stroke: {{ block.settings.outline_width }}px {{ block.settings.outline_color }};
+      color: {{ block.settings.text_color }};
+    }
+  {% elsif block.settings.highlight_style == 'shadow' %}
+    .ai-marquee-text-{{ ai_gen_id }} {
+      text-shadow: 
+        {{ block.settings.shadow_offset_x }}px 
+        {{ block.settings.shadow_offset_y }}px 
+        {{ block.settings.shadow_blur }}px 
+        {{ block.settings.shadow_color }};
+    }
+  {% elsif block.settings.highlight_style == 'glow' %}
+    .ai-marquee-text-{{ ai_gen_id }} {
+      text-shadow: 
+        0 0 {{ block.settings.glow_intensity }}px {{ block.settings.glow_color }},
+        0 0 {{ block.settings.glow_intensity | times: 2 }}px {{ block.settings.glow_color }},
+        0 0 {{ block.settings.glow_intensity | times: 3 }}px {{ block.settings.glow_color }};
+    }
+  {% elsif block.settings.highlight_style == 'underline' %}
+    .ai-marquee-text-{{ ai_gen_id }}::after {
+      content: '';
+      position: absolute;
+      bottom: {{ block.settings.underline_offset }}px;
+      left: 0;
+      right: 0;
+      height: {{ block.settings.underline_height }}px;
+      background: {{ block.settings.underline_color }};
+    }
+  {% endif %}
+
+  .ai-marquee-separator-{{ ai_gen_id }} {
+    display: inline-block;
+    width: {{ block.settings.separator_size }}px;
+    height: {{ block.settings.separator_size }}px;
+    background: {{ block.settings.separator_color }};
+    border-radius: 50%;
+    margin: 0 {{ block.settings.spacing }}px;
+    flex-shrink: 0;
+  }
+
+  @keyframes ai-marquee-scroll-{{ ai_gen_id }} {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .ai-marquee-container-{{ ai_gen_id }}:hover .ai-marquee-track-{{ ai_gen_id }} {
+    animation-play-state: paused;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-marquee-text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.font_size | times: 0.7 }}px;
+    }
+
+    .ai-marquee-container-{{ ai_gen_id }} {
+      padding: {{ block.settings.padding_vertical | times: 0.7 }}px 0;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-marquee-container-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-marquee-track-{{ ai_gen_id }}">
+    {% for i in (1..2) %}
+      <div class="ai-marquee-content-{{ ai_gen_id }}">
+        {% for j in (1..block.settings.repeat_count) %}
+          <span class="ai-marquee-text-{{ ai_gen_id }}">{{ block.settings.marquee_text }}</span>
+          {% if block.settings.show_separator %}
+            <span class="ai-marquee-separator-{{ ai_gen_id }}"></span>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Marquee text",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "marquee_text",
+      "label": "Text",
+      "default": "SILAII X BAAHUBALI"
+    },
+    {
+      "type": "range",
+      "id": "repeat_count",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "label": "Repeat count",
+      "default": 6
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 20,
+      "max": 120,
+      "step": 2,
+      "unit": "px",
+      "label": "Font size",
+      "default": 60
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Font weight",
+      "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "500", "label": "Medium" },
+        { "value": "600", "label": "Semi bold" },
+        { "value": "700", "label": "Bold" },
+        { "value": "800", "label": "Extra bold" },
+        { "value": "900", "label": "Black" }
+      ],
+      "default": "800"
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Text transform",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "uppercase", "label": "Uppercase" },
+        { "value": "lowercase", "label": "Lowercase" },
+        { "value": "capitalize", "label": "Capitalize" }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Letter spacing",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Highlight style"
+    },
+    {
+      "type": "select",
+      "id": "highlight_style",
+      "label": "Style",
+      "options": [
+        { "value": "none", "label": "None" },
+        { "value": "gradient", "label": "Gradient" },
+        { "value": "outline", "label": "Outline" },
+        { "value": "shadow", "label": "Shadow" },
+        { "value": "glow", "label": "Glow" },
+        { "value": "underline", "label": "Underline" }
+      ],
+      "default": "gradient"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#c16452"
+    },
+    {
+      "type": "color",
+      "id": "highlight_color_1",
+      "label": "Gradient start",
+      "default": "#c16452"
+    },
+    {
+      "type": "color",
+      "id": "highlight_color_2",
+      "label": "Gradient end",
+      "default": "#b61d0f"
+    },
+    {
+      "type": "range",
+      "id": "gradient_angle",
+      "min": 0,
+      "max": 360,
+      "step": 10,
+      "unit": "deg",
+      "label": "Gradient angle",
+      "default": 90
+    },
+    {
+      "type": "color",
+      "id": "outline_color",
+      "label": "Outline color",
+      "default": "#171717"
+    },
+    {
+      "type": "range",
+      "id": "outline_width",
+      "min": 1,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "Outline width",
+      "default": 2
+    },
+    {
+      "type": "color",
+      "id": "shadow_color",
+      "label": "Shadow color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "shadow_offset_x",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Shadow horizontal offset",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "shadow_offset_y",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Shadow vertical offset",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "shadow_blur",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Shadow blur",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "glow_color",
+      "label": "Glow color",
+      "default": "#c16452"
+    },
+    {
+      "type": "range",
+      "id": "glow_intensity",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "Glow intensity",
+      "default": 15
+    },
+    {
+      "type": "color",
+      "id": "underline_color",
+      "label": "Underline color",
+      "default": "#c16452"
+    },
+    {
+      "type": "range",
+      "id": "underline_height",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Underline height",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "underline_offset",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Underline offset",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Separator"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_separator",
+      "label": "Show separator",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "separator_color",
+      "label": "Separator color",
+      "default": "#c16452"
+    },
+    {
+      "type": "range",
+      "id": "separator_size",
+      "min": 4,
+      "max": 16,
+      "step": 2,
+      "unit": "px",
+      "label": "Separator size",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#171717"
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Vertical padding",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "spacing",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Text spacing",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "animation_speed",
+      "min": 10,
+      "max": 60,
+      "step": 5,
+      "unit": "s",
+      "label": "Animation speed",
+      "default": 30
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee text"
+    }
+  ]
+}
+{% endschema %}

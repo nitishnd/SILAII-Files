@@ -1,0 +1,286 @@
+{% doc %}
+  @prompt
+    SILAII x BAAHUBALI scroll marquee layout 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-marquee-container-{{ ai_gen_id }} {
+    width: 100%;
+    overflow: hidden;
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.padding_vertical }}px 0;
+    position: relative;
+  }
+
+  .ai-marquee-wrapper-{{ ai_gen_id }} {
+    display: flex;
+    width: fit-content;
+    animation: ai-marquee-scroll-{{ ai_gen_id }} {{ block.settings.scroll_speed }}s linear infinite;
+  }
+
+  .ai-marquee-content-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .ai-marquee-item-{{ ai_gen_id }} {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 {{ block.settings.item_spacing }}px;
+    color: {{ block.settings.text_color }};
+    font-size: {{ block.settings.font_size }}px;
+    font-weight: {{ block.settings.font_weight }};
+    letter-spacing: {{ block.settings.letter_spacing }}px;
+  }
+
+  {% if block.settings.text_transform == 'uppercase' %}
+    .ai-marquee-item-{{ ai_gen_id }} {
+      text-transform: uppercase;
+    }
+  {% elsif block.settings.text_transform == 'lowercase' %}
+    .ai-marquee-item-{{ ai_gen_id }} {
+      text-transform: lowercase;
+    }
+  {% endif %}
+
+  .ai-marquee-separator-{{ ai_gen_id }} {
+    display: inline-block;
+    width: {{ block.settings.separator_size }}px;
+    height: {{ block.settings.separator_size }}px;
+    background-color: {{ block.settings.separator_color }};
+    border-radius: 50%;
+    margin: 0 {{ block.settings.item_spacing }}px;
+  }
+
+  @keyframes ai-marquee-scroll-{{ ai_gen_id }} {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .ai-marquee-container-{{ ai_gen_id }}:hover .ai-marquee-wrapper-{{ ai_gen_id }} {
+    {% if block.settings.pause_on_hover %}
+      animation-play-state: paused;
+    {% endif %}
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-marquee-item-{{ ai_gen_id }} {
+      font-size: {{ block.settings.font_size | times: 0.8 }}px;
+      padding: 0 {{ block.settings.item_spacing | times: 0.7 }}px;
+    }
+
+    .ai-marquee-separator-{{ ai_gen_id }} {
+      width: {{ block.settings.separator_size | times: 0.8 }}px;
+      height: {{ block.settings.separator_size | times: 0.8 }}px;
+      margin: 0 {{ block.settings.item_spacing | times: 0.7 }}px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-marquee-container-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-marquee-wrapper-{{ ai_gen_id }}">
+    <div class="ai-marquee-content-{{ ai_gen_id }}">
+      {% for i in (1..block.settings.repeat_count) %}
+        <span class="ai-marquee-item-{{ ai_gen_id }}">{{ block.settings.text }}</span>
+        <span class="ai-marquee-separator-{{ ai_gen_id }}"></span>
+      {% endfor %}
+    </div>
+    <div class="ai-marquee-content-{{ ai_gen_id }}" aria-hidden="true">
+      {% for i in (1..block.settings.repeat_count) %}
+        <span class="ai-marquee-item-{{ ai_gen_id }}">{{ block.settings.text }}</span>
+        <span class="ai-marquee-separator-{{ ai_gen_id }}"></span>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Scroll marquee",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "text",
+      "label": "Text",
+      "default": "SILAII x BAAHUBALI"
+    },
+    {
+      "type": "range",
+      "id": "repeat_count",
+      "min": 5,
+      "max": 20,
+      "step": 1,
+      "label": "Repeat count",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Animation"
+    },
+    {
+      "type": "range",
+      "id": "scroll_speed",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "s",
+      "label": "Scroll speed",
+      "default": 30
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on hover",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Typography"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 12,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Font size",
+      "default": 32
+    },
+    {
+      "type": "select",
+      "id": "font_weight",
+      "label": "Font weight",
+      "options": [
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi-bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        },
+        {
+          "value": "800",
+          "label": "Extra bold"
+        }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "select",
+      "id": "text_transform",
+      "label": "Text transform",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "uppercase",
+          "label": "Uppercase"
+        },
+        {
+          "value": "lowercase",
+          "label": "Lowercase"
+        }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "letter_spacing",
+      "min": 0,
+      "max": 10,
+      "step": 1,
+      "unit": "px",
+      "label": "Letter spacing",
+      "default": 2
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "item_spacing",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Item spacing",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical",
+      "min": 10,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Vertical padding",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Separator"
+    },
+    {
+      "type": "range",
+      "id": "separator_size",
+      "min": 4,
+      "max": 16,
+      "step": 2,
+      "unit": "px",
+      "label": "Separator size",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "separator_color",
+      "label": "Separator color",
+      "default": "#c16452"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#ffffff"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Scroll marquee"
+    }
+  ]
+}
+{% endschema %}

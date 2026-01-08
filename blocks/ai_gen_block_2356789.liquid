@@ -1,0 +1,678 @@
+{% doc %}
+  @prompt
+    this a featured single product page for the Movie Merchandise product, need persuasive  layout with limited edition, the layout should be more beautiful and stand alone 
+    
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-featured-product-{{ ai_gen_id }} {
+    background: linear-gradient(135deg, {{ block.settings.background_gradient_start }} 0%, {{ block.settings.background_gradient_end }} 100%);
+    padding: 60px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-featured-product-container-{{ ai_gen_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .ai-featured-product-image-wrapper-{{ ai_gen_id }} {
+    position: relative;
+  }
+
+  .ai-featured-product-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: auto;
+    border-radius: {{ block.settings.image_border_radius }}px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    transition: transform 0.4s ease;
+  }
+
+  .ai-featured-product-image-{{ ai_gen_id }}:hover {
+    transform: scale(1.02);
+  }
+
+  .ai-featured-product-image-placeholder-{{ ai_gen_id }} {
+    background-color: #f4f4f4;
+    border-radius: {{ block.settings.image_border_radius }}px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-featured-product-image-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 400px;
+    max-height: 400px;
+  }
+
+  .ai-featured-product-badge-{{ ai_gen_id }} {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background-color: {{ block.settings.badge_bg_color }};
+    color: {{ block.settings.badge_text_color }};
+    padding: 15px 25px;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: uppercase;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    z-index: 3;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.2;
+    animation: ai-pulse-{{ ai_gen_id }} 2s ease-in-out infinite;
+  }
+
+  @keyframes ai-pulse-{{ ai_gen_id }} {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
+
+  .ai-featured-product-content-{{ ai_gen_id }} {
+    color: {{ block.settings.text_color }};
+  }
+
+  .ai-featured-product-subtitle-{{ ai_gen_id }} {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: {{ block.settings.accent_color }};
+    margin-bottom: 15px;
+    font-weight: 600;
+  }
+
+  .ai-featured-product-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    font-weight: bold;
+    margin: 0 0 20px;
+    color: {{ block.settings.heading_color }};
+    line-height: 1.2;
+  }
+
+  .ai-featured-product-description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.description_size }}px;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    color: {{ block.settings.text_color }};
+  }
+
+  .ai-featured-product-price-wrapper-{{ ai_gen_id }} {
+    margin-bottom: 30px;
+  }
+
+  .ai-featured-product-price-{{ ai_gen_id }} {
+    font-size: 36px;
+    font-weight: bold;
+    color: {{ block.settings.price_color }};
+  }
+
+  .ai-featured-product-compare-price-{{ ai_gen_id }} {
+    font-size: 24px;
+    text-decoration: line-through;
+    color: {{ block.settings.compare_price_color }};
+    margin-left: 15px;
+    opacity: 0.7;
+  }
+
+  .ai-featured-product-highlights-{{ ai_gen_id }} {
+    margin-bottom: 30px;
+  }
+
+  .ai-featured-product-highlight-item-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 16px;
+  }
+
+  .ai-featured-product-highlight-icon-{{ ai_gen_id }} {
+    width: 24px;
+    height: 24px;
+    margin-right: 12px;
+    color: {{ block.settings.accent_color }};
+    flex-shrink: 0;
+  }
+
+  .ai-featured-product-cta-wrapper-{{ ai_gen_id }} {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+  }
+
+  .ai-featured-product-button-{{ ai_gen_id }} {
+    padding: 18px 40px;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+  }
+
+  .ai-featured-product-button-primary-{{ ai_gen_id }} {
+    background-color: {{ block.settings.button_bg_color }};
+    color: {{ block.settings.button_text_color }};
+  }
+
+  .ai-featured-product-button-primary-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_bg_color }};
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .ai-featured-product-button-secondary-{{ ai_gen_id }} {
+    background-color: transparent;
+    color: {{ block.settings.secondary_button_color }};
+    border: 2px solid {{ block.settings.secondary_button_color }};
+  }
+
+  .ai-featured-product-button-secondary-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.secondary_button_color }};
+    color: {{ block.settings.button_text_color }};
+    transform: translateY(-2px);
+  }
+
+  .ai-featured-product-urgency-{{ ai_gen_id }} {
+    margin-top: 25px;
+    padding: 15px 20px;
+    background-color: {{ block.settings.urgency_bg_color }};
+    border-left: 4px solid {{ block.settings.accent_color }};
+    border-radius: 4px;
+    font-size: 14px;
+    color: {{ block.settings.urgency_text_color }};
+    font-weight: 600;
+  }
+
+  .ai-featured-product-decorative-circle-{{ ai_gen_id }} {
+    position: absolute;
+    border-radius: 50%;
+    opacity: 0.1;
+    pointer-events: none;
+  }
+
+  .ai-featured-product-circle-1-{{ ai_gen_id }} {
+    width: 300px;
+    height: 300px;
+    background-color: {{ block.settings.accent_color }};
+    top: -100px;
+    left: -100px;
+  }
+
+  .ai-featured-product-circle-2-{{ ai_gen_id }} {
+    width: 200px;
+    height: 200px;
+    background-color: {{ block.settings.accent_color }};
+    bottom: -50px;
+    right: -50px;
+  }
+
+  @media screen and (max-width: 768px) {
+    .ai-featured-product-container-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+
+    .ai-featured-product-{{ ai_gen_id }} {
+      padding: 40px 20px;
+    }
+
+    .ai-featured-product-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.7 }}px;
+    }
+
+    .ai-featured-product-badge-{{ ai_gen_id }} {
+      width: 100px;
+      height: 100px;
+      font-size: 12px;
+      padding: 10px 15px;
+    }
+
+    .ai-featured-product-price-{{ ai_gen_id }} {
+      font-size: 28px;
+    }
+
+    .ai-featured-product-compare-price-{{ ai_gen_id }} {
+      font-size: 20px;
+    }
+
+    .ai-featured-product-cta-wrapper-{{ ai_gen_id }} {
+      flex-direction: column;
+    }
+
+    .ai-featured-product-button-{{ ai_gen_id }} {
+      width: 100%;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-featured-product-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-featured-product-decorative-circle-{{ ai_gen_id }} ai-featured-product-circle-1-{{ ai_gen_id }}"></div>
+  <div class="ai-featured-product-decorative-circle-{{ ai_gen_id }} ai-featured-product-circle-2-{{ ai_gen_id }}"></div>
+
+  <div class="ai-featured-product-container-{{ ai_gen_id }}">
+    <div class="ai-featured-product-image-wrapper-{{ ai_gen_id }}">
+      {% if block.settings.product_image %}
+        <img
+          src="{{ block.settings.product_image | image_url: width: 1200 }}"
+          alt="{{ block.settings.product_image.alt | escape }}"
+          loading="lazy"
+          width="{{ block.settings.product_image.width }}"
+          height="{{ block.settings.product_image.height }}"
+          class="ai-featured-product-image-{{ ai_gen_id }}"
+        >
+      {% else %}
+        <div class="ai-featured-product-image-placeholder-{{ ai_gen_id }}">
+          {{ 'product-1' | placeholder_svg_tag }}
+        </div>
+      {% endif %}
+
+      {% if block.settings.show_badge %}
+        <div class="ai-featured-product-badge-{{ ai_gen_id }}">
+          {{ block.settings.badge_text }}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="ai-featured-product-content-{{ ai_gen_id }}">
+      {% if block.settings.subtitle != blank %}
+        <div class="ai-featured-product-subtitle-{{ ai_gen_id }}">
+          {{ block.settings.subtitle }}
+        </div>
+      {% endif %}
+
+      {% if block.settings.title != blank %}
+        <h2 class="ai-featured-product-title-{{ ai_gen_id }}">
+          {{ block.settings.title }}
+        </h2>
+      {% endif %}
+
+      {% if block.settings.description != blank %}
+        <div class="ai-featured-product-description-{{ ai_gen_id }}">
+          {{ block.settings.description }}
+        </div>
+      {% endif %}
+
+      {% if block.settings.show_price %}
+        <div class="ai-featured-product-price-wrapper-{{ ai_gen_id }}">
+          <span class="ai-featured-product-price-{{ ai_gen_id }}">
+            {{ block.settings.price }}
+          </span>
+          {% if block.settings.compare_price != blank %}
+            <span class="ai-featured-product-compare-price-{{ ai_gen_id }}">
+              {{ block.settings.compare_price }}
+            </span>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if block.settings.show_highlights %}
+        <div class="ai-featured-product-highlights-{{ ai_gen_id }}">
+          {% if block.settings.highlight_1 != blank %}
+            <div class="ai-featured-product-highlight-item-{{ ai_gen_id }}">
+              <svg class="ai-featured-product-highlight-icon-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>{{ block.settings.highlight_1 }}</span>
+            </div>
+          {% endif %}
+
+          {% if block.settings.highlight_2 != blank %}
+            <div class="ai-featured-product-highlight-item-{{ ai_gen_id }}">
+              <svg class="ai-featured-product-highlight-icon-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>{{ block.settings.highlight_2 }}</span>
+            </div>
+          {% endif %}
+
+          {% if block.settings.highlight_3 != blank %}
+            <div class="ai-featured-product-highlight-item-{{ ai_gen_id }}">
+              <svg class="ai-featured-product-highlight-icon-{{ ai_gen_id }}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <span>{{ block.settings.highlight_3 }}</span>
+            </div>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      <div class="ai-featured-product-cta-wrapper-{{ ai_gen_id }}">
+        {% if block.settings.primary_button_text != blank %}
+          <a
+            href="{{ block.settings.primary_button_link }}"
+            class="ai-featured-product-button-{{ ai_gen_id }} ai-featured-product-button-primary-{{ ai_gen_id }}"
+          >
+            {{ block.settings.primary_button_text }}
+          </a>
+        {% endif %}
+
+        {% if block.settings.secondary_button_text != blank %}
+          <a
+            href="{{ block.settings.secondary_button_link }}"
+            class="ai-featured-product-button-{{ ai_gen_id }} ai-featured-product-button-secondary-{{ ai_gen_id }}"
+          >
+            {{ block.settings.secondary_button_text }}
+          </a>
+        {% endif %}
+      </div>
+
+      {% if block.settings.show_urgency and block.settings.urgency_text != blank %}
+        <div class="ai-featured-product-urgency-{{ ai_gen_id }}">
+          {{ block.settings.urgency_text }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Featured movie product",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Product image"
+    },
+    {
+      "type": "image_picker",
+      "id": "product_image",
+      "label": "Product image"
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Image border radius",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Limited edition badge"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Show badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Badge text",
+      "default": "Limited Edition"
+    },
+    {
+      "type": "color",
+      "id": "badge_bg_color",
+      "label": "Badge background",
+      "default": "#c20000"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Product content"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Exclusive Movie Merchandise"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Product title",
+      "default": "Baahubali Epic Collection"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 24,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 48
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Own a piece of cinematic history with this exclusive limited edition collectible from the legendary Baahubali saga.</p>"
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 14,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Pricing"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show price",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "price",
+      "label": "Price",
+      "default": "₹4,999"
+    },
+    {
+      "type": "text",
+      "id": "compare_price",
+      "label": "Compare at price"
+    },
+    {
+      "type": "header",
+      "content": "Product highlights"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_highlights",
+      "label": "Show highlights",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "highlight_1",
+      "label": "Highlight 1",
+      "default": "Officially licensed merchandise"
+    },
+    {
+      "type": "text",
+      "id": "highlight_2",
+      "label": "Highlight 2",
+      "default": "Numbered certificate of authenticity"
+    },
+    {
+      "type": "text",
+      "id": "highlight_3",
+      "label": "Highlight 3",
+      "default": "Only 500 pieces worldwide"
+    },
+    {
+      "type": "header",
+      "content": "Call to action"
+    },
+    {
+      "type": "text",
+      "id": "primary_button_text",
+      "label": "Primary button text",
+      "default": "Buy Now"
+    },
+    {
+      "type": "url",
+      "id": "primary_button_link",
+      "label": "Primary button link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_button_text",
+      "label": "Secondary button text",
+      "default": "Learn More"
+    },
+    {
+      "type": "url",
+      "id": "secondary_button_link",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Button border radius",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Urgency message"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_urgency",
+      "label": "Show urgency message",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "urgency_text",
+      "label": "Urgency text",
+      "default": "⚡ Only 12 left in stock - Order now before it's gone forever!"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_gradient_start",
+      "label": "Background gradient start",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "background_gradient_end",
+      "label": "Background gradient end",
+      "default": "#2d2d2d"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent",
+      "default": "#c16452"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Price",
+      "default": "#c16452"
+    },
+    {
+      "type": "color",
+      "id": "compare_price_color",
+      "label": "Compare price",
+      "default": "#999999"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Primary button background",
+      "default": "#c16452"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg_color",
+      "label": "Primary button hover",
+      "default": "#b61d0f"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "secondary_button_color",
+      "label": "Secondary button",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "urgency_bg_color",
+      "label": "Urgency background",
+      "default": "#2a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "urgency_text_color",
+      "label": "Urgency text",
+      "default": "#ffcc00"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured movie product"
+    }
+  ]
+}
+{% endschema %}

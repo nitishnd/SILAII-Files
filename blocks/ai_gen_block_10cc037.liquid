@@ -1,0 +1,511 @@
+{% doc %}
+  @prompt
+    description layout with A1 content which shows the specs of the products and description. 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-product-description-{{ ai_gen_id }} {
+    background-color: {{ block.settings.background_color }};
+    padding: {{ block.settings.section_padding }}px 20px;
+  }
+
+  .ai-product-description__container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: {{ block.settings.content_gap }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .ai-product-description__container-{{ ai_gen_id }} {
+      grid-template-columns: {% if block.settings.layout == 'specs-left' %}1fr 1.5fr{% else %}1.5fr 1fr{% endif %};
+      gap: {{ block.settings.content_gap | times: 1.5 }}px;
+    }
+  }
+
+  .ai-product-description__specs-{{ ai_gen_id }} {
+    background-color: {{ block.settings.specs_bg_color }};
+    padding: {{ block.settings.specs_padding }}px;
+    border-radius: {{ block.settings.border_radius }}px;
+    {% if block.settings.layout == 'specs-left' %}
+      order: 1;
+    {% else %}
+      order: 2;
+    {% endif %}
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-product-description__specs-{{ ai_gen_id }} {
+      order: 2;
+    }
+  }
+
+  .ai-product-description__specs-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.specs_title_size }}px;
+    color: {{ block.settings.specs_title_color }};
+    margin: 0 0 {{ block.settings.specs_padding | divided_by: 2 }}px;
+    font-weight: 600;
+  }
+
+  .ai-product-description__specs-list-{{ ai_gen_id }} {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .ai-product-description__spec-item-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: space-between;
+    padding: {{ block.settings.spec_item_padding }}px 0;
+    border-bottom: 1px solid {{ block.settings.divider_color }};
+    gap: 16px;
+  }
+
+  .ai-product-description__spec-item-{{ ai_gen_id }}:last-child {
+    border-bottom: none;
+  }
+
+  .ai-product-description__spec-label-{{ ai_gen_id }} {
+    font-weight: 600;
+    color: {{ block.settings.spec_label_color }};
+    font-size: {{ block.settings.spec_text_size }}px;
+    flex-shrink: 0;
+  }
+
+  .ai-product-description__spec-value-{{ ai_gen_id }} {
+    color: {{ block.settings.spec_value_color }};
+    font-size: {{ block.settings.spec_text_size }}px;
+    text-align: right;
+  }
+
+  .ai-product-description__content-{{ ai_gen_id }} {
+    {% if block.settings.layout == 'specs-left' %}
+      order: 2;
+    {% else %}
+      order: 1;
+    {% endif %}
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-product-description__content-{{ ai_gen_id }} {
+      order: 1;
+    }
+  }
+
+  .ai-product-description__title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.description_title_size }}px;
+    color: {{ block.settings.description_title_color }};
+    margin: 0 0 {{ block.settings.description_title_size | divided_by: 2 }}px;
+    font-weight: 600;
+  }
+
+  .ai-product-description__text-{{ ai_gen_id }} {
+    font-size: {{ block.settings.description_text_size }}px;
+    color: {{ block.settings.description_text_color }};
+    line-height: 1.6;
+  }
+
+  .ai-product-description__text-{{ ai_gen_id }} p {
+    margin: 0 0 16px;
+  }
+
+  .ai-product-description__text-{{ ai_gen_id }} p:last-child {
+    margin-bottom: 0;
+  }
+
+  .ai-product-description__text-{{ ai_gen_id }} ul,
+  .ai-product-description__text-{{ ai_gen_id }} ol {
+    margin: 0 0 16px;
+    padding-left: 20px;
+  }
+
+  .ai-product-description__text-{{ ai_gen_id }} h1,
+  .ai-product-description__text-{{ ai_gen_id }} h2,
+  .ai-product-description__text-{{ ai_gen_id }} h3,
+  .ai-product-description__text-{{ ai_gen_id }} h4,
+  .ai-product-description__text-{{ ai_gen_id }} h5,
+  .ai-product-description__text-{{ ai_gen_id }} h6 {
+    color: {{ block.settings.description_title_color }};
+    margin: 0 0 12px;
+  }
+{% endstyle %}
+
+<div class="ai-product-description-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-product-description__container-{{ ai_gen_id }}">
+    <div class="ai-product-description__specs-{{ ai_gen_id }}">
+      {% if block.settings.specs_title != blank %}
+        <h3 class="ai-product-description__specs-title-{{ ai_gen_id }}">
+          {{ block.settings.specs_title }}
+        </h3>
+      {% endif %}
+
+      <ul class="ai-product-description__specs-list-{{ ai_gen_id }}">
+        {% for i in (1..8) %}
+          {% liquid
+            assign spec_label_key = 'spec_' | append: i | append: '_label'
+            assign spec_value_key = 'spec_' | append: i | append: '_value'
+            assign spec_label = block.settings[spec_label_key]
+            assign spec_value = block.settings[spec_value_key]
+          %}
+
+          {% if spec_label != blank and spec_value != blank %}
+            <li class="ai-product-description__spec-item-{{ ai_gen_id }}">
+              <span class="ai-product-description__spec-label-{{ ai_gen_id }}">
+                {{ spec_label }}
+              </span>
+              <span class="ai-product-description__spec-value-{{ ai_gen_id }}">
+                {{ spec_value }}
+              </span>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="ai-product-description__content-{{ ai_gen_id }}">
+      {% if block.settings.description_title != blank %}
+        <h2 class="ai-product-description__title-{{ ai_gen_id }}">
+          {{ block.settings.description_title }}
+        </h2>
+      {% endif %}
+
+      {% if block.settings.description != blank %}
+        <div class="ai-product-description__text-{{ ai_gen_id }}">
+          {{ block.settings.description }}
+        </div>
+      {% else %}
+        <div class="ai-product-description__text-{{ ai_gen_id }}">
+          {{ product.description }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Description with specs",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "Layout",
+      "options": [
+        {
+          "value": "specs-left",
+          "label": "Specs left, description right"
+        },
+        {
+          "value": "specs-right",
+          "label": "Description left, specs right"
+        }
+      ],
+      "default": "specs-left"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 600,
+      "max": 1400,
+      "step": 50,
+      "unit": "px",
+      "label": "Maximum width",
+      "default": 1200
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Section padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "content_gap",
+      "min": 20,
+      "max": 80,
+      "step": 5,
+      "unit": "px",
+      "label": "Gap between columns",
+      "default": 40
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Specifications"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "specs_title",
+      "label": "Title",
+      "default": "Product Specifications"
+    },
+    {
+      "type": "range",
+      "id": "specs_title_size",
+      "min": 14,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Title size",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "specs_title_color",
+      "label": "Title color",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "specs_bg_color",
+      "label": "Background",
+      "default": "#f7f7f7"
+    },
+    {
+      "type": "range",
+      "id": "specs_padding",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Padding",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "spec_item_padding",
+      "min": 5,
+      "max": 25,
+      "step": 1,
+      "unit": "px",
+      "label": "Item spacing",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "spec_text_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 15
+    },
+    {
+      "type": "color",
+      "id": "spec_label_color",
+      "label": "Label",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "spec_value_color",
+      "label": "Value",
+      "default": "#050505"
+    },
+    {
+      "type": "color",
+      "id": "divider_color",
+      "label": "Divider",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "header",
+      "content": "Spec 1"
+    },
+    {
+      "type": "text",
+      "id": "spec_1_label",
+      "label": "Label",
+      "default": "Material"
+    },
+    {
+      "type": "text",
+      "id": "spec_1_value",
+      "label": "Value",
+      "default": "Premium Cotton"
+    },
+    {
+      "type": "header",
+      "content": "Spec 2"
+    },
+    {
+      "type": "text",
+      "id": "spec_2_label",
+      "label": "Label",
+      "default": "Dimensions"
+    },
+    {
+      "type": "text",
+      "id": "spec_2_value",
+      "label": "Value",
+      "default": "10 x 8 x 2 inches"
+    },
+    {
+      "type": "header",
+      "content": "Spec 3"
+    },
+    {
+      "type": "text",
+      "id": "spec_3_label",
+      "label": "Label",
+      "default": "Weight"
+    },
+    {
+      "type": "text",
+      "id": "spec_3_value",
+      "label": "Value",
+      "default": "1.2 lbs"
+    },
+    {
+      "type": "header",
+      "content": "Spec 4"
+    },
+    {
+      "type": "text",
+      "id": "spec_4_label",
+      "label": "Label"
+    },
+    {
+      "type": "text",
+      "id": "spec_4_value",
+      "label": "Value"
+    },
+    {
+      "type": "header",
+      "content": "Spec 5"
+    },
+    {
+      "type": "text",
+      "id": "spec_5_label",
+      "label": "Label"
+    },
+    {
+      "type": "text",
+      "id": "spec_5_value",
+      "label": "Value"
+    },
+    {
+      "type": "header",
+      "content": "Spec 6"
+    },
+    {
+      "type": "text",
+      "id": "spec_6_label",
+      "label": "Label"
+    },
+    {
+      "type": "text",
+      "id": "spec_6_value",
+      "label": "Value"
+    },
+    {
+      "type": "header",
+      "content": "Spec 7"
+    },
+    {
+      "type": "text",
+      "id": "spec_7_label",
+      "label": "Label"
+    },
+    {
+      "type": "text",
+      "id": "spec_7_value",
+      "label": "Value"
+    },
+    {
+      "type": "header",
+      "content": "Spec 8"
+    },
+    {
+      "type": "text",
+      "id": "spec_8_label",
+      "label": "Label"
+    },
+    {
+      "type": "text",
+      "id": "spec_8_value",
+      "label": "Value"
+    },
+    {
+      "type": "header",
+      "content": "Description"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "description_title",
+      "label": "Title",
+      "default": "Product Description"
+    },
+    {
+      "type": "range",
+      "id": "description_title_size",
+      "min": 16,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "label": "Title size",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "description_title_color",
+      "label": "Title color",
+      "default": "#171717"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "info": "Leave blank to use product description"
+    },
+    {
+      "type": "range",
+      "id": "description_text_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Text size",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "description_text_color",
+      "label": "Text color",
+      "default": "#050505"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Description with specs"
+    }
+  ]
+}
+{% endschema %}

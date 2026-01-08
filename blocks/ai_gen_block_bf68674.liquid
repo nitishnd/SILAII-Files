@@ -1,0 +1,839 @@
+{% doc %}
+  @prompt
+    this layout is text layout Heading and Sub heading and paragraph text, mentioning about the movie greatness with visually great minimal clean layout, highlighting the features of the movie
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-movie-features-{{ ai_gen_id }} {
+    padding: {{ block.settings.section_padding }}px 20px;
+    background-color: {{ block.settings.background_color }};
+    max-width: {{ block.settings.max_width }}px;
+    margin: 0 auto;
+  }
+
+  .ai-movie-features__container-{{ ai_gen_id }} {
+    max-width: {{ block.settings.content_max_width }}px;
+    margin: 0 auto;
+    text-align: {{ block.settings.text_alignment }};
+  }
+
+  .ai-movie-features__subheading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.subheading_size }}px;
+    color: {{ block.settings.subheading_color }};
+    margin: 0 0 {{ block.settings.subheading_spacing }}px;
+    letter-spacing: {{ block.settings.subheading_letter_spacing }}px;
+    text-transform: {{ block.settings.subheading_transform }};
+    font-weight: {{ block.settings.subheading_weight }};
+  }
+
+  .ai-movie-features__heading-{{ ai_gen_id }} {
+    font-size: {{ block.settings.heading_size }}px;
+    color: {{ block.settings.heading_color }};
+    margin: 0 0 {{ block.settings.heading_spacing }}px;
+    line-height: {{ block.settings.heading_line_height }};
+    font-weight: {{ block.settings.heading_weight }};
+  }
+
+  .ai-movie-features__description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.description_size }}px;
+    color: {{ block.settings.description_color }};
+    line-height: {{ block.settings.description_line_height }};
+    margin: 0 0 {{ block.settings.features_spacing }}px;
+  }
+
+  .ai-movie-features__features-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat({{ block.settings.features_columns }}, 1fr);
+    gap: {{ block.settings.features_gap }}px;
+    margin-top: {{ block.settings.features_spacing }}px;
+  }
+
+  .ai-movie-features__feature-{{ ai_gen_id }} {
+    padding: {{ block.settings.feature_padding }}px;
+    background-color: {{ block.settings.feature_bg_color }};
+    border-radius: {{ block.settings.feature_border_radius }}px;
+    border: {{ block.settings.feature_border_width }}px solid {{ block.settings.feature_border_color }};
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  {% if block.settings.enable_feature_hover %}
+    .ai-movie-features__feature-{{ ai_gen_id }}:hover {
+      transform: translateY(-{{ block.settings.hover_lift }}px);
+      box-shadow: 0 {{ block.settings.hover_shadow }}px {{ block.settings.hover_shadow | times: 2 }}px rgba(0, 0, 0, 0.1);
+    }
+  {% endif %}
+
+  .ai-movie-features__feature-icon-{{ ai_gen_id }} {
+    font-size: {{ block.settings.icon_size }}px;
+    margin-bottom: {{ block.settings.icon_spacing }}px;
+    display: block;
+  }
+
+  .ai-movie-features__feature-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.feature_title_size }}px;
+    color: {{ block.settings.feature_title_color }};
+    margin: 0 0 {{ block.settings.feature_title_spacing }}px;
+    font-weight: {{ block.settings.feature_title_weight }};
+  }
+
+  .ai-movie-features__feature-text-{{ ai_gen_id }} {
+    font-size: {{ block.settings.feature_text_size }}px;
+    color: {{ block.settings.feature_text_color }};
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  @media screen and (max-width: 768px) {
+    .ai-movie-features-{{ ai_gen_id }} {
+      padding: {{ block.settings.section_padding | times: 0.6 }}px 16px;
+    }
+
+    .ai-movie-features__heading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.heading_size | times: 0.7 }}px;
+    }
+
+    .ai-movie-features__subheading-{{ ai_gen_id }} {
+      font-size: {{ block.settings.subheading_size | times: 0.8 }}px;
+    }
+
+    .ai-movie-features__description-{{ ai_gen_id }} {
+      font-size: {{ block.settings.description_size | times: 0.9 }}px;
+    }
+
+    .ai-movie-features__features-{{ ai_gen_id }} {
+      grid-template-columns: repeat({{ block.settings.features_columns_mobile }}, 1fr);
+      gap: {{ block.settings.features_gap | times: 0.7 }}px;
+    }
+
+    .ai-movie-features__feature-{{ ai_gen_id }} {
+      padding: {{ block.settings.feature_padding | times: 0.7 }}px;
+    }
+  }
+{% endstyle %}
+
+<div class="ai-movie-features-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-movie-features__container-{{ ai_gen_id }}">
+    {% if block.settings.subheading != blank %}
+      <div class="ai-movie-features__subheading-{{ ai_gen_id }}">
+        {{ block.settings.subheading }}
+      </div>
+    {% endif %}
+
+    {% if block.settings.heading != blank %}
+      <h2 class="ai-movie-features__heading-{{ ai_gen_id }}">
+        {{ block.settings.heading }}
+      </h2>
+    {% endif %}
+
+    {% if block.settings.description != blank %}
+      <div class="ai-movie-features__description-{{ ai_gen_id }}">
+        {{ block.settings.description }}
+      </div>
+    {% endif %}
+
+    <div class="ai-movie-features__features-{{ ai_gen_id }}">
+      {% for i in (1..6) %}
+        {% liquid
+          assign feature_enabled_key = 'feature_' | append: i | append: '_enabled'
+          assign feature_icon_key = 'feature_' | append: i | append: '_icon'
+          assign feature_title_key = 'feature_' | append: i | append: '_title'
+          assign feature_text_key = 'feature_' | append: i | append: '_text'
+
+          assign feature_enabled = block.settings[feature_enabled_key]
+          assign feature_icon = block.settings[feature_icon_key]
+          assign feature_title = block.settings[feature_title_key]
+          assign feature_text = block.settings[feature_text_key]
+        %}
+
+        {% if feature_enabled %}
+          <div class="ai-movie-features__feature-{{ ai_gen_id }}">
+            {% if feature_icon != blank %}
+              <span class="ai-movie-features__feature-icon-{{ ai_gen_id }}">
+                {{ feature_icon }}
+              </span>
+            {% endif %}
+
+            {% if feature_title != blank %}
+              <h3 class="ai-movie-features__feature-title-{{ ai_gen_id }}">
+                {{ feature_title }}
+              </h3>
+            {% endif %}
+
+            {% if feature_text != blank %}
+              <div class="ai-movie-features__feature-text-{{ ai_gen_id }}">
+                {{ feature_text }}
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Movie features",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Section padding",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 800,
+      "max": 1600,
+      "step": 40,
+      "unit": "px",
+      "label": "Maximum width",
+      "default": 1440
+    },
+    {
+      "type": "range",
+      "id": "content_max_width",
+      "min": 400,
+      "max": 1200,
+      "step": 40,
+      "unit": "px",
+      "label": "Content maximum width",
+      "default": 880
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "header",
+      "content": "Subheading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "AN EPIC MASTERPIECE"
+    },
+    {
+      "type": "range",
+      "id": "subheading_size",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "subheading_color",
+      "label": "Color",
+      "default": "#c16452"
+    },
+    {
+      "type": "range",
+      "id": "subheading_spacing",
+      "min": 4,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Bottom spacing",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "subheading_letter_spacing",
+      "min": 0,
+      "max": 4,
+      "step": 0.5,
+      "unit": "px",
+      "label": "Letter spacing",
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "subheading_transform",
+      "label": "Text transform",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "uppercase",
+          "label": "Uppercase"
+        },
+        {
+          "value": "lowercase",
+          "label": "Lowercase"
+        },
+        {
+          "value": "capitalize",
+          "label": "Capitalize"
+        }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "select",
+      "id": "subheading_weight",
+      "label": "Font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi-bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "header",
+      "content": "Heading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Baahubali: The Epic"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Font size",
+      "default": 48
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Color",
+      "default": "#171717"
+    },
+    {
+      "type": "range",
+      "id": "heading_spacing",
+      "min": 8,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Bottom spacing",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "heading_line_height",
+      "min": 1,
+      "max": 2,
+      "step": 0.1,
+      "label": "Line height",
+      "default": 1.2
+    },
+    {
+      "type": "select",
+      "id": "heading_weight",
+      "label": "Font weight",
+      "options": [
+        {
+          "value": "300",
+          "label": "Light"
+        },
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi-bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "700"
+    },
+    {
+      "type": "header",
+      "content": "Description"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>A cinematic masterpiece that redefined Indian cinema with its breathtaking visuals, powerful storytelling, and unforgettable characters. Experience the grandeur of an epic tale that captivated audiences worldwide.</p>"
+    },
+    {
+      "type": "range",
+      "id": "description_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "description_color",
+      "label": "Color",
+      "default": "#050505"
+    },
+    {
+      "type": "range",
+      "id": "description_line_height",
+      "min": 1.2,
+      "max": 2,
+      "step": 0.1,
+      "label": "Line height",
+      "default": 1.7
+    },
+    {
+      "type": "header",
+      "content": "Features grid"
+    },
+    {
+      "type": "range",
+      "id": "features_spacing",
+      "min": 20,
+      "max": 80,
+      "step": 4,
+      "unit": "px",
+      "label": "Top spacing",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "features_columns",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "label": "Columns",
+      "default": 3
+    },
+    {
+      "type": "select",
+      "id": "features_columns_mobile",
+      "label": "Columns on mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "1"
+    },
+    {
+      "type": "range",
+      "id": "features_gap",
+      "min": 8,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Gap between features",
+      "default": 24
+    },
+    {
+      "type": "header",
+      "content": "Feature cards"
+    },
+    {
+      "type": "range",
+      "id": "feature_padding",
+      "min": 8,
+      "max": 60,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "feature_bg_color",
+      "label": "Background color",
+      "default": "#f7f7f7"
+    },
+    {
+      "type": "range",
+      "id": "feature_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "feature_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Border width",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "feature_border_color",
+      "label": "Border color",
+      "default": "#e0e0e0"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_feature_hover",
+      "label": "Enable hover effect",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "hover_lift",
+      "min": 0,
+      "max": 12,
+      "step": 2,
+      "unit": "px",
+      "label": "Hover lift",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "hover_shadow",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Hover shadow",
+      "default": 8
+    },
+    {
+      "type": "header",
+      "content": "Feature icon"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "min": 16,
+      "max": 60,
+      "step": 2,
+      "unit": "px",
+      "label": "Icon size",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "icon_spacing",
+      "min": 4,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Bottom spacing",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Feature title"
+    },
+    {
+      "type": "range",
+      "id": "feature_title_size",
+      "min": 12,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 18
+    },
+    {
+      "type": "color",
+      "id": "feature_title_color",
+      "label": "Color",
+      "default": "#171717"
+    },
+    {
+      "type": "range",
+      "id": "feature_title_spacing",
+      "min": 4,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Bottom spacing",
+      "default": 8
+    },
+    {
+      "type": "select",
+      "id": "feature_title_weight",
+      "label": "Font weight",
+      "options": [
+        {
+          "value": "400",
+          "label": "Normal"
+        },
+        {
+          "value": "500",
+          "label": "Medium"
+        },
+        {
+          "value": "600",
+          "label": "Semi-bold"
+        },
+        {
+          "value": "700",
+          "label": "Bold"
+        }
+      ],
+      "default": "600"
+    },
+    {
+      "type": "header",
+      "content": "Feature text"
+    },
+    {
+      "type": "range",
+      "id": "feature_text_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 14
+    },
+    {
+      "type": "color",
+      "id": "feature_text_color",
+      "label": "Color",
+      "default": "#050505"
+    },
+    {
+      "type": "header",
+      "content": "Feature 1"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_1_enabled",
+      "label": "Enable feature 1",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "feature_1_icon",
+      "label": "Icon",
+      "default": "🎬"
+    },
+    {
+      "type": "text",
+      "id": "feature_1_title",
+      "label": "Title",
+      "default": "Visual Spectacle"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_1_text",
+      "label": "Text",
+      "default": "Groundbreaking visual effects and stunning cinematography that set new standards in filmmaking."
+    },
+    {
+      "type": "header",
+      "content": "Feature 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_2_enabled",
+      "label": "Enable feature 2",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "feature_2_icon",
+      "label": "Icon",
+      "default": "⚔️"
+    },
+    {
+      "type": "text",
+      "id": "feature_2_title",
+      "label": "Title",
+      "default": "Epic Action"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_2_text",
+      "label": "Text",
+      "default": "Breathtaking battle sequences choreographed to perfection, creating unforgettable moments."
+    },
+    {
+      "type": "header",
+      "content": "Feature 3"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_3_enabled",
+      "label": "Enable feature 3",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "feature_3_icon",
+      "label": "Icon",
+      "default": "🎭"
+    },
+    {
+      "type": "text",
+      "id": "feature_3_title",
+      "label": "Title",
+      "default": "Powerful Storytelling"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_3_text",
+      "label": "Text",
+      "default": "A compelling narrative that weaves together drama, emotion, and mythology seamlessly."
+    },
+    {
+      "type": "header",
+      "content": "Feature 4"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_4_enabled",
+      "label": "Enable feature 4",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "feature_4_icon",
+      "label": "Icon",
+      "default": "🎵"
+    },
+    {
+      "type": "text",
+      "id": "feature_4_title",
+      "label": "Title",
+      "default": "Memorable Score"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_4_text",
+      "label": "Text",
+      "default": "An iconic musical score that elevates every scene and stays with you long after."
+    },
+    {
+      "type": "header",
+      "content": "Feature 5"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_5_enabled",
+      "label": "Enable feature 5",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "feature_5_icon",
+      "label": "Icon",
+      "default": "👑"
+    },
+    {
+      "type": "text",
+      "id": "feature_5_title",
+      "label": "Title",
+      "default": "Legendary Characters"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_5_text",
+      "label": "Text",
+      "default": "Unforgettable characters brought to life by stellar performances and deep character development."
+    },
+    {
+      "type": "header",
+      "content": "Feature 6"
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_6_enabled",
+      "label": "Enable feature 6",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "feature_6_icon",
+      "label": "Icon",
+      "default": "🌍"
+    },
+    {
+      "type": "text",
+      "id": "feature_6_title",
+      "label": "Title",
+      "default": "Global Impact"
+    },
+    {
+      "type": "textarea",
+      "id": "feature_6_text",
+      "label": "Text",
+      "default": "A cultural phenomenon that transcended borders and captivated audiences worldwide."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Movie features"
+    }
+  ]
+}
+{% endschema %}
