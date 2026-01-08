@@ -1,0 +1,74 @@
+{% assign nector_api_key = shop.metafields.nector.api_key %}
+{% assign nector_entity_id = shop.metafields.nector.entity_id %}
+{% assign nector_env = shop.metafields.nector.env %}
+{% assign nector_platform_url = 'https://platform.nector.io' %}
+{% assign nector_script_url = 'https://cdn.nector.io/nector-static/no-cache/reward-widget/mainloader.min.js' %}
+
+{% if nector_env != 'production' %}
+  {% assign nector_platform_url = 'https://stageplatform.nector.io' %}
+  {% assign nector_script_url = 'https://cdn.nector.io/nector-static/no-cache/stagereward-widget/mainloader.min.js' %}
+{% endif %}
+
+{% if type %}
+  {% assign page_type = type %}
+{% endif %}
+
+{% if product.selected_or_first_available_variant and product.selected_or_first_available_variant.price %}
+  {% assign nector_total_price = product.selected_or_first_available_variant.price | default: 0 | divided_by: 100 %}
+{% else %}
+  {% assign nector_total_price = product.price | default: 0 | divided_by: 100 %}
+
+{% elsif page_type == 'cart' %}
+  {% assign nector_total_price = cart.original_total_price | default: 0 | divided_by: 100 %}
+{% endif %}
+
+{% if redirect_url != empty and redirect_url != blank %}
+  {% assign nector_redirect_url = redirect_url %}
+{% endif %}
+
+{% if view_type != empty and view_type != blank %}
+  {% assign nector_view_type = view_type %}
+{% endif %}
+
+{% assign background_color = background_color %}
+{% assign text_color = text_color %}
+
+{% assign earn_coins_classes = earn_coins_classes | default: '' %}
+{% assign font_size = font_size | default: '' %}
+{% assign coin_per_unit = coin_per_unit | default: '' %}
+{% assign custom_text = custom_text | default: '' %}
+
+<script
+  async
+  src="{{nector_script_url}}"
+  data-op="customerearn"
+  data-platform_url="{{nector_platform_url}}"
+  data-api_key="{{nector_api_key}}"
+  data-platform="shopify"
+  data-customer_id="{{ customer.id }}"
+  {% if nector_redirect_url != empty and nector_redirect_url != blank %}
+    data-redirect_url="{{ nector_redirect_url }}"
+  {% endif %}
+  {% if nector_view_type != empty and nector_view_type != blank %}
+    data-view_type="{{ nector_view_type }}"
+  {% endif %}
+  data-price="{{ nector_total_price }}"
+  data-background_color="{{ background_color }}"
+  data-text_color="{{ text_color }}"
+  {% if earn_coins_classes != empty and earn_coins_classes != blank %}
+    data-earn_coins_classes="{{ earn_coins_classes }}"
+  {% endif %}
+  {% if font_size != empty and font_size != blank %}
+    data-font_size="{{ font_size }}"
+  {% endif %}
+  {% if coin_per_unit != empty and coin_per_unit != blank %}
+    data-coin_per_unit="{{ coin_per_unit }}"
+  {% endif %}
+  {% if custom_text != empty and custom_text != blank %}
+    data-custom_text="{{ custom_text }}"
+  {% endif %}
+></script>
+
+<script id="nector-product-variants-data" type="application/json">
+  {{ product.variants | json }}
+</script>

@@ -1,0 +1,166 @@
+{% assign nector_api_key = shop.metafields.nector.api_key %}
+{% assign nector_entity_id = shop.metafields.nector.entity_id %}
+{% assign nector_env = shop.metafields.nector.env %}
+{% assign nector_is_featured_reviews = is_featured_reviews | default: false %}
+{% assign nector_platform_url = 'https://platform.nector.io' %}
+{% assign nector_websdk_url = 'https://websdk.nector.io' %}
+{% assign nector_script_url = 'https://cdn.nector.io/nector-static/no-cache/reward-widget/mainloader.min.js' %}
+
+{% if customer %}
+  {% assign nector_customer_id = customer.id %}
+{% endif %}
+
+{% if product and product != empty and product != blank %}
+  {% assign nector_product_id = product.id %}
+{% endif %}
+
+{% if background_color and background_color != empty and background_color != blank %}
+  {% assign nector_background_color = background_color %}
+{% endif %}
+
+{% if view_type %}
+  {% assign nector_view_type = view_type %}
+{% endif %}
+
+{% if default_reviews_sort %}
+  {% assign nector_default_reviews_sort = default_reviews_sort %}
+{% endif %}
+
+{% if all_reviews %}
+  {% assign nector_all_reviews = all_reviews %}
+{% endif %}
+
+
+  {% assign nector_hide_date = true %}
+
+{% if show_qna %}
+  {% assign nector_show_qna = show_qna %}
+{% endif %}
+
+{% if hide_overall_rating %}
+  {% assign nector_hide_overall_rating = hide_overall_rating %}
+{% endif %}
+
+{% if hide_total_review_count %}
+  {% assign nector_hide_total_review_count = hide_total_review_count %}
+{% endif %}
+
+{% if nector_env != 'production' %}
+  {% assign nector_platform_url = 'https://stageplatform.nector.io' %}
+  {% assign nector_websdk_url = 'https://stagewebsdk.nector.io' %}
+  {% assign nector_script_url = 'https://cdn.nector.io/nector-static/no-cache/stagereward-widget/mainloader.min.js' %}
+{% endif %}
+
+{% if nector_product_id and nector_is_featured_reviews == false %}
+  {% assign nector_op = 'review_list' %}
+  {% if nector_background_color %}
+    <div style="background: {{ nector_background_color }};">
+      <script
+        async
+        src="{{nector_script_url}}"
+        data-op="{{nector_op}}"
+        data-platform_url="{{nector_platform_url}}"
+        data-websdk_url="{{nector_websdk_url}}"
+        data-api_key="{{nector_api_key}}"
+        data-entity_id="{{nector_entity_id}}"
+        data-product_id="{{nector_product_id}}"
+        data-platform="shopify"
+        {% if nector_default_reviews_sort %}
+          data-default_reviews_sort="{{ nector_default_reviews_sort }}"
+        {% endif %}
+        {% if nector_view_type %}
+          data-view_type="{{ nector_view_type }}"
+        {% endif %}
+        {% if nector_all_reviews %}
+          data-all_reviews="true"
+        {% endif %}
+        {% if nector_hide_date %}
+          data-hide_date="true"
+        {% endif %}
+        {% if nector_show_qna %}
+          data-show_qna="true"
+        {% endif %}
+        {% if nector_hide_overall_rating %}
+          data-hide_overall_rating="true"
+        {% endif %}
+        {% if nector_hide_total_review_count %}
+          data-hide_total_review_count="true"
+        {% endif %}
+      ></script>
+    </div>
+  {% else %}
+    <script
+      async
+      src="{{nector_script_url}}"
+      data-op="{{nector_op}}"
+      data-platform_url="{{nector_platform_url}}"
+      data-websdk_url="{{nector_websdk_url}}"
+      data-api_key="{{nector_api_key}}"
+      data-entity_id="{{nector_entity_id}}"
+      data-product_id="{{nector_product_id}}"
+      data-platform="shopify"
+      {% if nector_default_reviews_sort %}
+        data-default_reviews_sort="{{ nector_default_reviews_sort }}"
+      {% endif %}
+      {% if nector_view_type %}
+        data-view_type="{{nector_view_type}}"
+      {% endif %}
+      {% if nector_all_reviews %}
+        data-all_reviews="true"
+      {% endif %}
+      {% if nector_hide_date %}
+        data-hide_date="true"
+      {% endif %}
+      {% if nector_show_qna %}
+        data-show_qna="true"
+      {% endif %}
+      {% if nector_hide_overall_rating %}
+        data-hide_overall_rating="true"
+      {% endif %}
+      {% if nector_hide_total_review_count %}
+        data-hide_total_review_count="true"
+      {% endif %}
+    ></script>
+  {% endif %}
+{% elsif nector_is_featured_reviews == true %}
+  {% if nector_background_color %}
+    <div style="background: {{ nector_background_color }};">
+      <script
+        async
+        src="{{nector_script_url}}"
+        data-op="featured_review_list"
+        data-platform_url="{{nector_platform_url}}"
+        data-websdk_url="{{nector_websdk_url}}"
+        data-api_key="{{nector_api_key}}"
+        data-entity_id="{{nector_entity_id}}"
+        data-platform="shopify"
+        {% if nector_view_type %}
+          data-view_type="{{nector_view_type}}"
+        {% endif %}
+        {% if nector_show_qna %}
+          data-show_qna="true"
+        {% endif %}
+        {% if nector_hide_overall_rating %}
+          data-hide_overall_rating="true"
+        {% endif %}
+      ></script>
+    </div>
+  {% else %}
+    <script
+      async
+      src="{{nector_script_url}}"
+      data-op="featured_review_list"
+      data-platform_url="{{nector_platform_url}}"
+      data-websdk_url="{{nector_websdk_url}}"
+      data-api_key="{{nector_api_key}}"
+      data-entity_id="{{nector_entity_id}}"
+      data-platform="shopify"
+      {% if nector_hide_title %}
+        data-hide_title="true"
+      {% endif %}
+      {% if nector_hide_overall_rating %}
+        data-hide_overall_rating="true"
+      {% endif %}
+    ></script>
+  {% endif %}
+{% endif %}
