@@ -1,0 +1,1622 @@
+{%- comment -%}
+{
+  "pack_name": "Daily promotions - flip",
+  "pack_author": "Design Packs"
+}
+{%- endcomment -%}
+
+{% comment %} Security Code - hides section when app uninstalled {% endcomment %}
+{%- unless content_for_header contains 'design_packs_file.js' -%}
+  {%- if request.design_mode -%}
+    <div class="dsgn-pck__no-app-warning">
+      <div class="dsgn-pck__no-app-warning-background">
+      </div>
+      <div class="dsgn-pck__no-app-warning-text dsgn-pck__rte">
+        <p><strong>WARNING!</strong> This premium section will not display properly without an active subscription for <a href="https://apps.shopify.com/design-packs" target="_blank" rel="nofollow">Design Packs</a>. If you need any support please email <a href="mailto:info@design-packs.com" target="_blank">info@design-packs.com</a> with your questions.</p>
+      </div>
+    </div>
+  {%- endif -%}
+  {%- break -%}
+{%- endunless -%}
+
+{%- comment -%} Assign: Preview section js fix {%- endcomment -%}
+{%- assign section_id = section.id | replace: '+', '' -%}
+
+{% comment %} Images: responsive image widths {% endcomment %}
+{%- assign widths = '180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 1950, 2100, 2260, 2450, 2700, 3000, 3350, 3750, 4100' -%}
+
+{%- comment -%} Layout: has user entered measurement value into max-width field? {%- endcomment -%}
+{%- if section.settings.max_width contains 'px' or section.settings.max_width contains '%' -%}
+  {%- assign max_width = section.settings.max_width -%}
+{%- else -%}
+  {%- assign max_width = section.settings.max_width | append: 'px' -%}
+{%- endif -%}
+
+{%- comment -%} Text: custom font_picker values {%- endcomment -%}
+{%- capture font_settings_list -%}
+{{ section.settings.main_font | font_face: font_display: 'swap' }}~
+{{ section.settings.main_font | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{{ section.settings.main_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}~
+{{ section.settings.main_font | font_modify: 'style', 'italic' | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_modify: 'style', 'italic' | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}
+{%- endcapture -%}
+{%- assign font_array = font_settings_list | split: '~' -%}
+
+{%- capture minify -%}
+{%- comment -%} CSS {%- endcomment -%}
+<style>
+{%- if section.settings.override_theme_font != blank -%}
+  {%- for font in font_array -%}
+    {%- unless font contains 'error' -%}{{ font }}{%- endunless -%}
+  {%- endfor -%}
+  #DP--{{ section_id }} {
+    --main-font: {{ section.settings.main_font.family }}, {{ section.settings.main_font.fallback_families }};
+    --main-font-weight: {{ section.settings.main_font.weight }};
+    --main-font-style: {{ section.settings.main_font.style }};
+    --heading-font: {{ section.settings.heading_font.family }}, {{ section.settings.heading_font.fallback_families }};
+    --heading-font-weight: {{ section.settings.heading_font.weight }};
+    --heading-font-style: {{ section.settings.heading_font.style }};
+  }
+{%- endif -%}
+
+#DP--{{ section_id }} {
+  --gutter: {{ section.settings.gap }}px;
+  --column-width: calc(calc(100% / {{ section.settings.per_row }}) - var(--gutter));
+  background: {{ section.settings.background_color }};
+  margin-top: {{ section.settings.outer_margin }}px;
+  margin-bottom: {{ section.settings.outer_margin }}px;
+  overflow-x: hidden;
+}
+
+#DP--{{ section_id }} .dsgn-pck__sizer {
+  padding-top: {{ section.settings.inner_padding }}px;
+  padding-bottom: {{ section.settings.inner_padding }}px;
+  width: calc({{ section.settings.base_width }}% + var(--gutter));
+  transform: translateX(-50%);
+  left: 50%;
+  position: relative;
+  margin:0;
+  max-width: calc({{ max_width }} + var(--gutter));
+}
+
+#DP--{{ section_id }} .dsgn-pck__grid {
+  grid-template-columns: repeat(auto-fit, minmax(var(--column-width), 1fr));
+  grid-auto-rows: auto;
+  grid-auto-flow: dense;
+}
+
+#DP--{{ section_id }} .dsgn-pck__grid-item--horizontal {
+  grid-column: span 2;
+  aspect-ratio: 2/1;
+}
+
+#DP--{{ section_id }}  .dsgn-pck__grid-item--vertical {
+  grid-row: span 2;
+  aspect-ratio: 1/2;
+}
+
+#DP--{{ section_id }}  .dsgn-pck__grid-item--big {
+  grid-column: span 2;
+  grid-row: span 2;
+  aspect-ratio: 1/1;
+}
+
+#DP--{{ section_id }}  .dsgn-pck__grid-item--small {
+  aspect-ratio: 1/1;
+}
+
+#DP--{{ section_id }} .dsgn-pck__grid-item {
+  position: relative;
+  height: 100%;
+  padding: calc(var(--gutter) / 2);
+}
+
+#DP--{{ section_id }} .dsgn-pck__status-present .dsgn-pck__card-face--front::after {
+  --border-padding: 10px;
+  content: '';
+  display: block;
+  position: absolute;
+  top: var(--border-padding);
+  left: var(--border-padding);
+  right: var(--border-padding);
+  bottom: var(--border-padding);
+  border: 2px solid #FFFFFF;
+  pointer-events: none;
+  z-index: 2;
+  border-radius: calc({{ section.settings.border_radius }}px - 6px);
+}
+
+#DP--{{ section_id }} .dsgn-pck__status-past .dsgn-pck__scene--card {
+  opacity: 0.5;
+}
+
+#DP--{{ section_id }} .dsgn-pck__status-present {
+  {% comment %} box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.3); {% endcomment %}
+  {% comment %} outline-offset: {{ section.settings.gap | divided_by: 2.0 }}px;
+  outline: 2px solid #000; {% endcomment %}
+}
+
+#DP--{{ section_id }} .dsgn-pck__status-future {
+  pointer-events: none;
+}
+
+#DP--{{ section_id }} .dsgn-pck__item img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  transition: 2s cubic-bezier(.25, .46, .45, .94);
+}
+
+#DP--{{ section_id }} .dsgn-pck__scene {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  perspective: 600px;
+}
+
+#DP--{{ section_id }} .dsgn-pck__card {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s ease-in-out;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+#DP--{{ section_id }} .dsgn-pck__card.dsgn-pck__flipped {
+  transform: rotateY(180deg);
+}
+
+#DP--{{ section_id }} .dsgn-pck__card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+{% comment %} Front of card {% endcomment %}
+
+#DP--{{ section_id }} .dsgn-pck__item:hover .dsgn-pck__card-face--front img {
+  transform: scale(1.1);
+}
+
+#DP--{{ section_id }} .dsgn-pck__card-face--front {
+  cursor: pointer;
+}
+
+#DP--{{ section_id }} .dsgn-pck__content--front {
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: relative;
+  color: {{ section.settings.text_color }};
+  background: {{ text_background_color }};
+  box-shadow: 0px 3px 15px rgba(0,0,0,0.2);
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--main-font);
+  font-weight: var(--main-font-weight);
+  font-style: var(--main-font-style);
+  {%- endif -%}
+  border-radius: {{ section.settings.border_radius }}px;
+}
+
+#DP--{{ section_id }} .dsgn-pck__inner-content--front {
+  max-width: min(600px, 90%);
+  z-index: 2;
+}
+
+#DP--{{ section_id }} .dsgn-pck__status-message {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 10px;
+  border-radius: {{ section.settings.border_radius }}px;
+  z-index: 2;
+}
+
+#DP--{{ section_id }} .dsgn-pck__status-present .dsgn-pck__status-message {
+  margin: 20px;
+}
+
+#DP--{{ section_id }} .dsgn-pck__status-message p {
+  margin: 0;
+  font-size: calc(var(--dp-g-body-size, var(--dp-body-size, 18px)) * {{ section.settings.text_size | times: 0.008 }});
+}
+
+{% comment %} Back of card {% endcomment %}
+
+#DP--{{ section_id }} .dsgn-pck__card-face--back {
+  transform: rotateY(180deg);
+  z-index: 2;
+  border-radius: {{ section.settings.border_radius }}px;
+}
+
+#DP--{{ section_id }} .dsgn-pck__content--back {
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border: {{ section.settings.border_width }}px solid {{ section.settings.text_color }};
+  overflow: hidden;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  position: relative;
+  color: {{ section.settings.text_color }};
+  background: {{ text_background_color }};
+  box-shadow: 0px 3px 15px rgba(0,0,0,0.2);
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--main-font);
+  font-weight: var(--main-font-weight);
+  font-style: var(--main-font-style);
+  {%- endif -%}
+  border-radius: {{ section.settings.border_radius }}px;
+}
+
+#DP--{{ section_id }} .dsgn-pck__inner-content--back {
+  max-width: 600px;
+  width: 100%;
+}
+
+#DP--{{ section_id }} .dsgn-pck__close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-image: url(data:image/svg+xml;base64,PHN2ZyBjbGlwLXJ1bGU9ImV2ZW5vZGQiIGZpbGwtcnVsZT0iZXZlbm9kZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLW1pdGVybGltaXQ9IjIiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJtMTIgMTAuOTMgNS43MTktNS43MmMuMTQ2LS4xNDYuMzM5LS4yMTkuNTMxLS4yMTkuNDA0IDAgLjc1LjMyNC43NS43NDkgMCAuMTkzLS4wNzMuMzg1LS4yMTkuNTMybC01LjcyIDUuNzE5IDUuNzE5IDUuNzE5Yy4xNDcuMTQ3LjIyLjMzOS4yMi41MzEgMCAuNDI3LS4zNDkuNzUtLjc1Ljc1LS4xOTIgMC0uMzg1LS4wNzMtLjUzMS0uMjE5bC01LjcxOS01LjcxOS01LjcxOSA1LjcxOWMtLjE0Ni4xNDYtLjMzOS4yMTktLjUzMS4yMTktLjQwMSAwLS43NS0uMzIzLS43NS0uNzUgMC0uMTkyLjA3My0uMzg0LjIyLS41MzFsNS43MTktNS43MTktNS43Mi01LjcxOWMtLjE0Ni0uMTQ3LS4yMTktLjMzOS0uMjE5LS41MzIgMC0uNDI1LjM0Ni0uNzQ5Ljc1LS43NDkuMTkyIDAgLjM4NS4wNzMuNTMxLjIxOXoiLz48L3N2Zz4=);
+  height: 24px;
+  width: 24px;
+  margin: 10px;
+  background-size: contain;
+  cursor: pointer;
+  z-index: 1;
+}
+
+#DP--{{ section_id }} .dsgn-pck__inset-image + .dsgn-pck__text {
+  margin-top: 15px;
+}
+
+#DP--{{ section_id }} .dsgn-pck__rte h1.dsgn-pck__small-heading {
+  font-size: calc(var(--dp-g-heading-size, var(--dp-heading-size, 35px)) * {{ section.settings.text_size | times: 0.011 }});
+}
+
+#DP--{{ section_id }} .dsgn-pck__rte h2.dsgn-pck__small-heading {
+  font-size: calc(var(--dp-g-heading-size, var(--dp-heading-size, 35px)) * {{ section.settings.text_size | times: 0.01 }});
+}
+
+#DP--{{ section_id }} .dsgn-pck__rte h3.dsgn-pck__small-heading {
+  font-size: calc(var(--dp-g-heading-size, var(--dp-heading-size, 35px)) * {{ section.settings.text_size | times: 0.009 }});
+}
+
+#DP--{{ section_id }} .dsgn-pck__rte h4.dsgn-pck__small-heading {
+  font-size: calc(var(--dp-g-heading-size, var(--dp-heading-size, 35px)) * {{ section.settings.text_size | times: 0.008 }});
+}
+
+#DP--{{ section_id }} .dsgn-pck__rte h5.dsgn-pck__small-heading {
+  font-size: calc(var(--dp-g-heading-size, var(--dp-heading-size, 35px)) * {{ section.settings.text_size | times: 0.007 }});
+}
+
+#DP--{{ section_id }} .dsgn-pck__rte h6.dsgn-pck__small-heading {
+  font-size: calc(var(--dp-g-heading-size, var(--dp-heading-size, 35px)) * {{ section.settings.text_size | times: 0.006 }});
+}
+
+#DP--{{ section_id }} .dsgn-pck__small-heading {
+  margin-bottom: 0.3em;
+  line-height: var(--dp-g-small-heading-line-height, var(--dp-small-heading-line-height, calc(3px + 2ex + 3px)));
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--heading-font);
+  font-weight: var(--heading-font-weight);
+  font-style: var(--heading-font-style);
+  {%- endif -%}
+}
+
+#DP--{{ section_id }} .dsgn-pck__text {
+  line-height: var(--dp-g-body-line-height, var(--dp-body-line-height, calc(3px + 2.5ex + 3px)));
+  font-size: calc(var(--dp-g-body-size, var(--dp-body-size, 18px)) * {{ section.settings.text_size | times: 0.01 }});
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--main-font);
+  font-weight: var(--main-font-weight);
+  font-style: var(--main-font-style);
+  {%- endif -%}
+}
+
+/* Animation */
+{%- if section.settings.animation != 'none' -%}
+  #DP--{{ section_id }}.dsgn-pck__animation-applied [style*="--dsgn-pck-animate"] {
+    /* animation-duration: 0.5s; */
+    /* --dsgn-pck-animation-multiplier: 1s; */
+    animation-name: dsgn-pck__animation--{{ section.settings.animation }};
+  }
+{%- else -%}
+  #DP--{{ section_id }} [style*="--dsgn-pck-animate"] {
+    opacity: 1;
+  }
+{% endif %}
+
+{%- if section.settings.custom_css != blank -%}
+  {%- assign custom_section_declarations = section.settings.custom_css | split: '}' -%}
+  {%- for declaration in custom_section_declarations -%}
+    {%- if declaration contains '{' -%}
+      #DP--{{ section_id }} {{ declaration }} }
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+
+/* Landscape phones and down */
+@media (max-width: 480px) {
+  #DP--{{ section_id }} {
+    margin-top: {{ section.settings.outer_margin | times: 0.75 | round: 0 }}px;
+    margin-bottom: {{ section.settings.outer_margin | times: 0.75 | round: 0 }}px;
+  }
+
+  #DP--{{ section_id }} .dsgn-pck__sizer {
+    --gutter: {{ section.settings.gap | times: 0.75 | round: 0 }}px;
+    min-width: 70%;
+    padding-top: {{ section.settings.inner_padding | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.inner_padding | times: 0.75 | round: 0 }}px;
+  }
+
+  #DP--{{ section_id }} .dsgn-pck__item:hover img {
+    transform: scale(1);
+  }
+
+  #DP--{{ section_id }} .dsgn-pck__item img {
+    transition: none;
+  }
+
+  {%- if section.settings.mobile_per_row == "2" -%}
+    #DP--{{ section_id }} .dsgn-pck__grid {
+      grid-template-columns: repeat(auto-fit, minmax(calc(50% - var(--gutter)), 1fr));
+    }
+  {%- endif -%}
+
+  {%- if section.settings.mobile_per_row == "1" -%}
+    #DP--{{ section_id }} .dsgn-pck__grid {
+      grid-template-columns: 1fr 1fr;
+      grid-auto-rows: auto;
+    }
+
+    #DP--{{ section_id }} .dsgn-pck__grid-item--vertical {
+      grid-column: span 2;
+      grid-row: span 4;
+    }
+    #DP--{{ section_id }} .dsgn-pck__grid-item--horizontal {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+    #DP--{{ section_id }} .dsgn-pck__grid-item--big {
+      grid-column: span 2;
+      grid-row: span 3;
+    }
+    #DP--{{ section_id }} .dsgn-pck__grid-item--small {
+      grid-column: span 2;
+      grid-row: span 3;
+    }
+  {%- endif -%}
+
+  {%- if section.settings.mobile_custom_css != blank -%}
+    {%- assign mobile_custom_declarations = section.settings.mobile_custom_css | split: '}' -%}
+    {%- for declaration in mobile_custom_declarations -%}
+      {%- if declaration contains '{' -%}
+        #DP--{{ section_id }} {{ declaration }} }
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+}
+</style>
+
+{%- comment -%} HTML {%- endcomment -%}
+<section id="DP--{{ section_id }}" class="DP--{{ section_id }} dsgn-pck__lookbook-grid dsgn-pck__section" {%- if section.settings.animation != 'none' -%}data-animated-section="{{ section.settings.animation }}"{%- endif -%}>
+  {%- if section.settings.anchor_id != blank -%}
+    <div id="{{ section.settings.anchor_id | remove: '#' | handleize }}" class="dsgn-pck__anchor-id" style="height: 0; overflow: hidden;"></div>
+  {%- endif -%}
+  <div class="dsgn-pck__sizer
+              dsgn-pck__sizer--lookbook-grid">
+    <div class="dsgn-pck__grid">
+      {% comment %} Capture logic for promotion visibility {% endcomment %}
+      {% capture now_unix %}{{ 'now' | date: '%s' }}{% endcapture %}
+      {%- capture today -%}{{ 'now' | date: "%Y-%m-%d %H:%M" }}{%- endcapture -%}
+      {%- capture today_no_time -%}{{ 'now' | date: "%Y-%m-%d" }}{%- endcapture -%}
+      {%- for block in section.blocks -%}
+        {%- case block.type -%}
+          {%- when 'scheduled_promotion' -%}
+            <style>
+              .dsgn-pck__block-id-{{ block.id }} .dsgn-pck__card-face--front {
+                color: {{ block.settings.front_text_color }};
+              }
+
+              .dsgn-pck__block-id-{{ block.id }} .dsgn-pck__card-face--front .dsgn-pck__content::after {
+                background: {{ block.settings.front_text_background_color }};
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                position: absolute;
+                content: '';
+                z-index: 1;
+                {%- if block.settings.image != blank -%}
+                  opacity: 0.5;
+                {%- endif -%}
+              }
+
+              .dsgn-pck__block-id-{{ block.id }} .dsgn-pck__card-face--back {
+                color: {{ block.settings.back_text_color }};
+                background: {{ block.settings.back_text_background_color }};
+              }
+
+              .dsgn-pck__block-id-{{ block.id }} .dsgn-pck__status-message {
+                background: {{ section.settings.badge_background_color }};
+              }
+
+              .dsgn-pck__block-id-{{ block.id }} .dsgn-pck__status-message p {
+                color: {{ section.settings.badge_text_color }};
+                padding: 5px 15px;
+              }
+            </style>
+
+            {%- if block.settings.date.size > 10 -%}
+              {%- capture block_start_unix -%}{{ block.settings.date | date: '%s' }}{%- endcapture -%}
+              {%- capture block_end_unix -%}{{ block.settings.date | date: '%s' | plus: 86400 }}{%- endcapture -%}
+              {%- if block_start_unix == blank -%}
+                {%- assign status = 'no-date' -%}
+              {%- elsif now_unix >= block_start_unix and now_unix < block_end_unix -%}
+                {%- assign status = 'present' -%}
+              {%- elsif now_unix < block_start_unix -%}
+                {%- assign status = 'future' -%}
+              {%- else -%}
+                {%- assign status = 'past' -%}
+              {%- endif -%}
+            {%- else -%}
+              {%- capture block_day_unix -%}{{ block.settings.date | date: '%s' }}{%- endcapture -%}
+              {%- if block_day_unix == blank -%}
+                {%- assign status = 'no-date' -%}
+              {%- elsif block.settings.date == today_no_time -%}
+                {%- assign status = 'present' -%}
+              {%- elsif block_day_unix > now_unix -%}
+                {%- assign status = 'future' -%}
+              {%- else -%}
+                {%- assign status = 'past' -%}
+              {%- endif -%}
+            {%- endif -%}
+
+            <div id="DP--{{ block.id }}" class="dsgn-pck__block dsgn-pck__block-id-{{ block.id }} dsgn-pck__block--{{ block.type }} dsgn-pck__block--{{ forloop.index }} dsgn-pck__grid-item--{{ block.settings.block_size }} dsgn-pck__grid-item dsgn-pck__item dsgn-pck__status-{{ status }}" {{ block.shopify_attributes }} style="--dsgn-pck-animate: {{ forloop.index }};">
+              {%- if block_day_unix == blank -%}
+                {% comment %} NO DATE {% endcomment %}
+              {%- elsif block.settings.date == today -%}
+                {% comment %} PRESENT {% endcomment %}
+              {%- elsif block_day_unix > now_unix -%}
+                {% comment %} FUTURE {% endcomment %}
+              {%- else -%}
+                {% comment %} PAST {% endcomment %}
+              {%- endif -%}
+
+              <div class="dsgn-pck__scene dsgn-pck__scene--card">
+                <div class="dsgn-pck__card">
+                  <div class="dsgn-pck__card-face dsgn-pck__card-face--front">
+                    <div class="dsgn-pck__content dsgn-pck__content--front dsgn-pck__flex dsgn-pck__justify-center dsgn-pck__align-center">
+                      {%- if block.settings.date != blank -%}
+                        <div class="dsgn-pck__status-message">
+                          {%- if status == 'present' -%}
+                            <p>{{ section.settings.present }}</p>
+                          {%- elsif status == 'future' -%}
+                            <p>{{ section.settings.future }}</p>
+                          {%- elsif status == 'past' -%}
+                            <p>{{ section.settings.past }}</p>
+                          {%- endif -%}
+                        </div>
+                      {%- endif -%}
+                      {%- if block.settings.image != blank -%}
+                        {%- capture image_width -%}
+                          {%- case block.settings.block_size -%}
+                            {%- when 'horizontal' -%}
+                              1.5
+                            {%- when 'vertical' -%}
+                              3
+                            {%- when 'small' -%}
+                              3
+                            {%- when 'big' -%}
+                              1.5
+                          {%- endcase -%}
+                        {%- endcapture -%}
+                        {%- capture sizes -%}
+                          (max-width: 480px) 100vw,{{ section.settings.base_width | divided_by: image_width | round | append: 'vw' | default: '33vw' }}
+                        {%- endcapture -%}
+                        {{ block.settings.image | image_url: width: 2800 | image_tag:  widths: widths, sizes: sizes }}
+                      {%- endif -%}
+                      <div class="dsgn-pck__inner-content--front dsgn-pck__relative">
+                        {%- if block.settings.title != blank -%}
+                          <div class="dsgn-pck__text dsgn-pck__rte">
+                            {{ block.settings.title
+                              | replace: 'h1', 'h1 class="dsgn-pck__small-heading"'
+                              | replace: 'h2', 'h2 class="dsgn-pck__small-heading"'
+                              | replace: 'h3', 'h3 class="dsgn-pck__small-heading"'
+                              | replace: 'h4', 'h4 class="dsgn-pck__small-heading"'
+                              | replace: 'h5', 'h5 class="dsgn-pck__small-heading"'
+                              | replace: 'h6', 'h6 class="dsgn-pck__small-heading"'
+                            }}
+                          </div>
+                        {%- endif -%}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="dsgn-pck__card-face dsgn-pck__card-face--back">
+                    <div class="dsgn-pck__content dsgn-pck__content--back dsgn-pck__flex dsgn-pck__justify-center dsgn-pck__align-center">
+                      <div class="dsgn-pck__inner-content--back">
+                        <div class="dsgn-pck__close" data-dsgn-pck-close></div>
+                        {%- if block.settings.inset_image != blank -%}
+                          <style>
+                            .dsgn-pck__block-id-{{ block.id }} .dsgn-pck__image__wrapper {
+                              width: {{ block.settings.inset_image_size }}%;
+                              display: inline-block;
+                            }
+
+                            .dsgn-pck__block-id-{{ block.id }} .dsgn-pck__image__wrapper svg {
+                              width: 100%;
+                            }
+
+                            .dsgn-pck__block-id-{{ block.id }} .dsgn-pck__image__wrapper path {
+                              fill: {{ section.settings.text_color }};
+                            }
+
+                            .dsgn-pck__block-id-{{ block.id }} .dsgn-pck__item img {
+                              width: 100%;
+                              object-fit: contain;
+                            }
+                          </style>
+                          <div class="dsgn-pck__inset-image dsgn-pck__flex dsgn-pck__justify-center">
+                            <div class="dsgn-pck__image__wrapper">
+                              {% if block.settings.link != blank %}
+                                <a href="{{ block.settings.link }}">
+                              {% endif %}
+                              <svg viewBox="0 0 {{ block.settings.inset_image.width }} {{ block.settings.inset_image.height }}"></svg>
+                              {%- capture sizes -%}
+                                (max-width: 480px) {{ block.settings.inset_image_size }}vw,(max-width: 767px) {{ block.settings.inset_image_size }}vw, {{ 0.5 | times: block.settings.inset_image_size | divided_by: 100.0 | times: 100.0 | round }}vw
+                              {%- endcapture -%}
+                              {{ block.settings.inset_image | image_url: width: 1000 | image_tag:  widths: widths, sizes: sizes }}
+                              {% if block.settings.link != blank %}</a>{% endif %}
+                            </div>
+                          </div>
+                        {%- endif -%}
+                        {%- if block.settings.text != blank -%}
+                          <div class="dsgn-pck__text dsgn-pck__rte">{{ block.settings.text }}</div>
+                        {%- endif -%}
+                        {%- if block.settings.liquid != blank -%}
+                          {{ block.settings.liquid }}
+                        {%- endif -%}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {%- else -%}
+          {%- endcase -%}
+
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{%- endcapture -%}
+{{ minify | strip_newlines }}
+
+{% schema %}
+{
+  "name": "Daily promotions - flip",
+  "class": "DP__daily-promotions",
+  "settings": [
+    {
+      "type": "range",
+      "id": "per_row",
+      "min": 2,
+      "max": 7,
+      "label": "Grid columns",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 0,
+      "max": 40,
+      "label": "Spacing gap",
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "🗓️ Scheduling"
+    },
+    {
+      "type": "select",
+      "id": "timezone",
+      "label": "Timezone",
+      "default": "-05:00 ~ (GMT-05:00) Eastern Time (US & Canada)",
+      "options": [
+        {
+          "value": "-11:00 ~ (GMT-11:00) International Date Line West",
+          "label": "(GMT-11:00) International Date Line West"
+        },
+        {
+          "value": "-11:00 ~ (GMT-11:00) Midway Island",
+          "label": "(GMT-11:00) Midway Island"
+        },
+        {
+          "value": "-11:00 ~ (GMT-11:00) American Samoa",
+          "label": "(GMT-11:00) American Samoa"
+        },
+        {
+          "value": "-10:00 ~ (GMT-10:00) Hawaii",
+          "label": "(GMT-10:00) Hawaii"
+        },
+        {
+          "value": "-09:00 ~ (GMT-09:00) Alaska",
+          "label": "(GMT-09:00) Alaska"
+        },
+        {
+          "value": "-08:00 ~ (GMT-08:00) Pacific Time (US & Canada)",
+          "label": "(GMT-08:00) Pacific Time (US & Canada)"
+        },
+        {
+          "value": "-08:00 ~ (GMT-08:00) Tijuana",
+          "label": "(GMT-08:00) Tijuana"
+        },
+        {
+          "value": "-07:00 ~ (GMT-07:00) Mountain Time (US & Canada)",
+          "label": "(GMT-07:00) Mountain Time (US & Canada)"
+        },
+        {
+          "value": "-07:00 ~ (GMT-07:00) Arizona",
+          "label": "(GMT-07:00) Arizona"
+        },
+        {
+          "value": "-07:00 ~ (GMT-07:00) Chihuahua",
+          "label": "(GMT-07:00) Chihuahua"
+        },
+        {
+          "value": "-06:00 ~ (GMT-06:00) Central Time (US & Canada)",
+          "label": "(GMT-06:00) Central Time (US & Canada)"
+        },
+        {
+          "value": "-06:00 ~ (GMT-06:00) Saskatchewan",
+          "label": "(GMT-06:00) Saskatchewan"
+        },
+        {
+          "value": "-06:00 ~ (GMT-06:00) Monterrey",
+          "label": "(GMT-06:00) Monterrey"
+        },
+        {
+          "value": "-05:00 ~ (GMT-05:00) Eastern Time (US & Canada)",
+          "label": "(GMT-05:00) Eastern Time (US & Canada)"
+        },
+        {
+          "value": "-05:00 ~ (GMT-05:00) Indiana (East)",
+          "label": "(GMT-05:00) Indiana (East)"
+        },
+        {
+          "value": "-05:00 ~ (GMT-05:00) Bogota",
+          "label": "(GMT-05:00) Bogota"
+        },
+        {
+          "value": "-05:00 ~ (GMT-05:00) Lima",
+          "label": "(GMT-05:00) Lima"
+        },
+        {
+          "value": "-05:00 ~ (GMT-05:00) Quito",
+          "label": "(GMT-05:00) Quito"
+        },
+        {
+          "value": "-04:00 ~ (GMT-04:00) Atlantic Time (Canada)",
+          "label": "(GMT-04:00) Atlantic Time (Canada)"
+        },
+        {
+          "value": "-04:30 ~ (GMT-04:30) Caracas",
+          "label": "(GMT-04:30) Caracas"
+        },
+        {
+          "value": "-04:00 ~ (GMT-04:00) La Paz",
+          "label": "(GMT-04:00) La Paz"
+        },
+        {
+          "value": "-04:00 ~ (GMT-04:00) Santiago",
+          "label": "(GMT-04:00) Santiago"
+        },
+        {
+          "value": "-03:30 ~ (GMT-03:30) Newfoundland",
+          "label": "(GMT-03:30) Newfoundland"
+        },
+        {
+          "value": "-03:00 ~ (GMT-03:00) Brasilia",
+          "label": "(GMT-03:00) Brasilia"
+        },
+        {
+          "value": "-03:00 ~ (GMT-03:00) Buenos Aires",
+          "label": "(GMT-03:00) Buenos Aires"
+        },
+        {
+          "value": "-04:00 ~ (GMT-04:00) Georgetown",
+          "label": "(GMT-04:00) Georgetown"
+        },
+        {
+          "value": "-03:00 ~ (GMT-03:00) Greenland",
+          "label": "(GMT-03:00) Greenland"
+        },
+        {
+          "value": "-01:00 ~ (GMT-01:00) Azores",
+          "label": "(GMT-01:00) Azores"
+        },
+        {
+          "value": "-01:00 ~ (GMT-01:00) Cape Verde Is.",
+          "label": "(GMT-01:00) Cape Verde Is."
+        },
+        {
+          "value": "+00:00 ~ (GMT+00:00) Dublin",
+          "label": "(GMT+00:00) Dublin"
+        },
+        {
+          "value": "+00:00 ~ (GMT+00:00) Edinburgh",
+          "label": "(GMT+00:00) Edinburgh"
+        },
+        {
+          "value": "+00:00 ~ (GMT+00:00) Lisbon",
+          "label": "(GMT+00:00) Lisbon"
+        },
+        {
+          "value": "+00:00 ~ (GMT+00:00) Casablanca",
+          "label": "(GMT+00:00) Casablanca"
+        },
+        {
+          "value": "+00:00 ~ (GMT+00:00) Monrovia",
+          "label": "(GMT+00:00) Monrovia"
+        },
+        {
+          "value": "+00:00 ~ (GMT+00:00) UTC",
+          "label": "(GMT+00:00) UTC"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Belgrade",
+          "label": "(GMT+01:00) Belgrade"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Bratislava",
+          "label": "(GMT+01:00) Bratislava"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Budapest",
+          "label": "(GMT+01:00) Budapest"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Ljubljana",
+          "label": "(GMT+01:00) Ljubljana"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Prague",
+          "label": "(GMT+01:00) Prague"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Sarajevo",
+          "label": "(GMT+01:00) Sarajevo"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Skopje",
+          "label": "(GMT+01:00) Skopje"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Warsaw",
+          "label": "(GMT+01:00) Warsaw"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Zagreb",
+          "label": "(GMT+01:00) Zagreb"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Brussels",
+          "label": "(GMT+01:00) Brussels"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Copenhagen",
+          "label": "(GMT+01:00) Copenhagen"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Madrid",
+          "label": "(GMT+01:00) Madrid"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Paris",
+          "label": "(GMT+01:00) Paris"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Amsterdam",
+          "label": "(GMT+01:00) Amsterdam"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Berlin",
+          "label": "(GMT+01:00) Berlin"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Bern",
+          "label": "(GMT+01:00) Bern"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Rome",
+          "label": "(GMT+01:00) Rome"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Stockholm",
+          "label": "(GMT+01:00) Stockholm"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) Vienna",
+          "label": "(GMT+01:00) Vienna"
+        },
+        {
+          "value": "+01:00 ~ (GMT+01:00) West Central Africa",
+          "label": "(GMT+01:00) West Central Africa"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Bucharest",
+          "label": "(GMT+02:00) Bucharest"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Cairo",
+          "label": "(GMT+02:00) Cairo"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Helsinki",
+          "label": "(GMT+02:00) Helsinki"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Kyiv",
+          "label": "(GMT+02:00) Kyiv"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Riga",
+          "label": "(GMT+02:00) Riga"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Sofia",
+          "label": "(GMT+02:00) Sofia"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Tallinn",
+          "label": "(GMT+02:00) Tallinn"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Vilnius",
+          "label": "(GMT+02:00) Vilnius"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Athens",
+          "label": "(GMT+02:00) Athens"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Istanbul",
+          "label": "(GMT+02:00) Istanbul"
+        },
+        {
+          "value": "+03:00 ~ (GMT+03:00) Minsk",
+          "label": "(GMT+03:00) Minsk"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Jerusalem",
+          "label": "(GMT+02:00) Jerusalem"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Harare",
+          "label": "(GMT+02:00) Harare"
+        },
+        {
+          "value": "+02:00 ~ (GMT+02:00) Pretoria",
+          "label": "(GMT+02:00) Pretoria"
+        },
+        {
+          "value": "+04:00 ~ (GMT+04:00) Moscow",
+          "label": "(GMT+04:00) Moscow"
+        },
+        {
+          "value": "+04:00 ~ (GMT+04:00) Volgograd",
+          "label": "(GMT+04:00) Volgograd"
+        },
+        {
+          "value": "+03:00 ~ (GMT+03:00) Kuwait",
+          "label": "(GMT+03:00) Kuwait"
+        },
+        {
+          "value": "+03:00 ~ (GMT+03:00) Riyadh",
+          "label": "(GMT+03:00) Riyadh"
+        },
+        {
+          "value": "+03:00 ~ (GMT+03:00) Nairobi",
+          "label": "(GMT+03:00) Nairobi"
+        },
+        {
+          "value": "+03:00 ~ (GMT+03:00) Baghdad",
+          "label": "(GMT+03:00) Baghdad"
+        },
+        {
+          "value": "+03:30 ~ (GMT+03:30) Tehran",
+          "label": "(GMT+03:30) Tehran"
+        },
+        {
+          "value": "+04:00 ~ (GMT+04:00) Abu Dhabi",
+          "label": "(GMT+04:00) Abu Dhabi"
+        },
+        {
+          "value": "+04:00 ~ (GMT+04:00) Muscat",
+          "label": "(GMT+04:00) Muscat"
+        },
+        {
+          "value": "+04:00 ~ (GMT+04:00) Baku",
+          "label": "(GMT+04:00) Baku"
+        },
+        {
+          "value": "+04:00 ~ (GMT+04:00) Tbilisi",
+          "label": "(GMT+04:00) Tbilisi"
+        },
+        {
+          "value": "+04:00 ~ (GMT+04:00) Yerevan",
+          "label": "(GMT+04:00) Yerevan"
+        },
+        {
+          "value": "+04:30 ~ (GMT+04:30) Kabul",
+          "label": "(GMT+04:30) Kabul"
+        },
+        {
+          "value": "+06:00 ~ (GMT+06:00) Ekaterinburg",
+          "label": "(GMT+06:00) Ekaterinburg"
+        },
+        {
+          "value": "+05:00 ~ (GMT+05:00) Islamabad",
+          "label": "(GMT+05:00) Islamabad"
+        },
+        {
+          "value": "+05:00 ~ (GMT+05:00) Karachi",
+          "label": "(GMT+05:00) Karachi"
+        },
+        {
+          "value": "+05:00 ~ (GMT+05:00) Tashkent",
+          "label": "(GMT+05:00) Tashkent"
+        },
+        {
+          "value": "+05:30 ~ (GMT+05:30) Chennai",
+          "label": "(GMT+05:30) Chennai"
+        },
+        {
+          "value": "+05:30 ~ (GMT+05:30) Kolkata",
+          "label": "(GMT+05:30) Kolkata"
+        },
+        {
+          "value": "+05:45 ~ (GMT+05:45) Kathmandu",
+          "label": "(GMT+05:45) Kathmandu"
+        },
+        {
+          "value": "+06:00 ~ (GMT+06:00) Astana",
+          "label": "(GMT+06:00) Astana"
+        },
+        {
+          "value": "+06:00 ~ (GMT+06:00) Dhaka",
+          "label": "(GMT+06:00) Dhaka"
+        },
+        {
+          "value": "+05:30 ~ (GMT+05:30) Sri Jayawardenepura",
+          "label": "(GMT+05:30) Sri Jayawardenepura"
+        },
+        {
+          "value": "+06:00 ~ (GMT+06:00) Almaty",
+          "label": "(GMT+06:00) Almaty"
+        },
+        {
+          "value": "+07:00 ~ (GMT+07:00) Novosibirsk",
+          "label": "(GMT+07:00) Novosibirsk"
+        },
+        {
+          "value": "+06:30 ~ (GMT+06:30) Rangoon",
+          "label": "(GMT+06:30) Rangoon"
+        },
+        {
+          "value": "+07:00 ~ (GMT+07:00) Bangkok",
+          "label": "(GMT+07:00) Bangkok"
+        },
+        {
+          "value": "+07:00 ~ (GMT+07:00) Hanoi",
+          "label": "(GMT+07:00) Hanoi"
+        },
+        {
+          "value": "+07:00 ~ (GMT+07:00) Jakarta",
+          "label": "(GMT+07:00) Jakarta"
+        },
+        {
+          "value": "+08:00 ~ (GMT+08:00) Krasnoyarsk",
+          "label": "(GMT+08:00) Krasnoyarsk"
+        },
+        {
+          "value": "+08:00 ~ (GMT+08:00) Beijing",
+          "label": "(GMT+08:00) Beijing"
+        },
+        {
+          "value": "+08:00 ~ (GMT+08:00) Chongqing",
+          "label": "(GMT+08:00) Chongqing"
+        },
+        {
+          "value": "+08:00 ~ (GMT+08:00) Hong Kong",
+          "label": "(GMT+08:00) Hong Kong"
+        },
+        {
+          "value": "+08:00 ~ (GMT+08:00) Urumqi",
+          "label": "(GMT+08:00) Urumqi"
+        },
+        {
+          "value": "+08:00 ~ (GMT+08:00) Kuala Lumpur",
+          "label": "(GMT+08:00) Kuala Lumpur"
+        },
+        {
+          "value": "+08:00 ~ (GMT+08:00) Singapore",
+          "label": "(GMT+08:00) Singapore"
+        },
+        {
+          "value": "+08:00 ~ (GMT+08:00) Taipei",
+          "label": "(GMT+08:00) Taipei"
+        },
+        {
+          "value": "+08:00 ~ (GMT+08:00) Perth",
+          "label": "(GMT+08:00) Perth"
+        },
+        {
+          "value": "+09:00 ~ (GMT+09:00) Irkutsk",
+          "label": "(GMT+09:00) Irkutsk"
+        },
+        {
+          "value": "+08:00 ~ (GMT+08:00) Ulaan Bataar",
+          "label": "(GMT+08:00) Ulaan Bataar"
+        },
+        {
+          "value": "+09:00 ~ (GMT+09:00) Seoul",
+          "label": "(GMT+09:00) Seoul"
+        },
+        {
+          "value": "+09:00 ~ (GMT+09:00) Osaka",
+          "label": "(GMT+09:00) Osaka"
+        },
+        {
+          "value": "+10:00 ~ (GMT+10:00) Yakutsk",
+          "label": "(GMT+10:00) Yakutsk"
+        },
+        {
+          "value": "+09:30 ~ (GMT+09:30) Darwin",
+          "label": "(GMT+09:30) Darwin"
+        },
+        {
+          "value": "+09:30 ~ (GMT+09:30) Adelaide",
+          "label": "(GMT+09:30) Adelaide"
+        },
+        {
+          "value": "+10:00 ~ (GMT+10:00) Canberra",
+          "label": "(GMT+10:00) Canberra"
+        },
+        {
+          "value": "+10:00 ~ (GMT+10:00) Melbourne",
+          "label": "(GMT+10:00) Melbourne"
+        },
+        {
+          "value": "+10:00 ~ (GMT+10:00) Sydney",
+          "label": "(GMT+10:00) Sydney"
+        },
+        {
+          "value": "+10:00 ~ (GMT+10:00) Brisbane",
+          "label": "(GMT+10:00) Brisbane"
+        },
+        {
+          "value": "+10:00 ~ (GMT+10:00) Hobart",
+          "label": "(GMT+10:00) Hobart"
+        },
+        {
+          "value": "+11:00 ~ (GMT+11:00) Vladivostok",
+          "label": "(GMT+11:00) Vladivostok"
+        },
+        {
+          "value": "+10:00 ~ (GMT+10:00) Guam",
+          "label": "(GMT+10:00) Guam"
+        },
+        {
+          "value": "+10:00 ~ (GMT+10:00) Port Moresby",
+          "label": "(GMT+10:00) Port Moresby"
+        },
+        {
+          "value": "+12:00 ~ (GMT+12:00) Magadan",
+          "label": "(GMT+12:00) Magadan"
+        },
+        {
+          "value": "+12:00 ~ (GMT+12:00) Solomon Is.",
+          "label": "(GMT+12:00) Solomon Is."
+        },
+        {
+          "value": "+12:00 ~ (GMT+12:00) Fiji",
+          "label": "(GMT+12:00) Fiji"
+        },
+        {
+          "value": "+12:00 ~ (GMT+12:00) Kamchatka",
+          "label": "(GMT+12:00) Kamchatka"
+        },
+        {
+          "value": "+12:00 ~ (GMT+12:00) Marshall Is.",
+          "label": "(GMT+12:00) Marshall Is."
+        },
+        {
+          "value": "+12:00 ~ (GMT+12:00) Auckland",
+          "label": "(GMT+12:00) Auckland"
+        },
+        {
+          "value": "+13:00 ~ (GMT+13:00) Nuku'alofa",
+          "label": "(GMT+13:00) Nuku'alofa"
+        },
+        {
+          "value": "+13:00 ~ (GMT+13:00) Tokelau Is.",
+          "label": "(GMT+13:00) Tokelau Is."
+        },
+        {
+          "value": "+13:00 ~ (GMT+13:00) Samoa",
+          "label": "(GMT+13:00) Samoa"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "present",
+      "label": "Present day badge",
+      "default": "Today's Deal!"
+    },
+    {
+      "type": "text",
+      "id": "past",
+      "label": "Past badge",
+      "default": "Deal Expired"
+    },
+    {
+      "type": "text",
+      "id": "future",
+      "label": "Future badge",
+      "default": "Coming Soon"
+    },
+    {
+      "type": "header",
+      "content": "✏️ Text appearance"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 80,
+      "max": 150,
+      "step": 5,
+      "default": 100,
+      "unit": "%"
+    },
+    {
+      "type": "header",
+      "content": "📱 Mobile"
+    },
+    {
+      "type": "select",
+      "id": "mobile_per_row",
+      "label": "Blocks per row",
+      "default": "1",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "🎨 Design"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge text"
+    },
+    {
+      "type": "color",
+      "id": "badge_background_color",
+      "label": "Badge background"
+    },
+    {
+      "type": "color_background",
+      "id": "background_color",
+      "label": "Background"
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "label": "Border radius",
+      "min": 0,
+      "max": 50,
+      "default": 0,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "label": "Border width",
+      "min": 0,
+      "max": 8,
+      "step": 1,
+      "default": 2,
+      "unit": "px"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Animation",
+      "default": "none",
+      "options": [
+        {
+          "value": "fade-in",
+          "label": "Fade-in"
+        },
+        {
+          "value": "fade-in-left",
+          "label": "Fade-in left"
+        },
+        {
+          "value": "fade-in-right",
+          "label": "Fade-in right"
+        },
+        {
+          "value": "fade-in-up",
+          "label": "Fade-in up"
+        },
+        {
+          "value": "fade-in-down",
+          "label": "Fade-in down"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "🖼 Layout"
+    },
+    {
+      "type": "range",
+      "id": "base_width",
+      "label": "Size",
+      "min": 60,
+      "max": 100,
+      "step": 5,
+      "default": 95,
+      "unit": "%"
+    },
+    {
+      "type": "text",
+      "id": "max_width",
+      "label": "Maximum width",
+      "placeholder": "eg. 1200px",
+      "info": "Sets width constraint for content.",
+      "default": "1000"
+    },
+    {
+      "type": "range",
+      "id": "inner_padding",
+      "label": "Inner padding",
+      "info": "Only applies to top and bottom.",
+      "min": 0,
+      "max": 100,
+      "default": 20,
+      "step": 5,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "outer_margin",
+      "label": "Outer margin",
+      "info": "Only applies to top and bottom.",
+      "min": 0,
+      "max": 100,
+      "default": 40,
+      "step": 5,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "🚨 Advanced"
+    },
+    {
+      "type": "liquid",
+      "id": "custom_css",
+      "label": "CSS"
+    },
+    {
+      "type": "liquid",
+      "id": "mobile_custom_css",
+      "label": "Mobile CSS",
+      "info": "Applied on screens less than 480px."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Link anchor id",
+      "placeholder": "#design-pack-section",
+      "info": "Enter a unique value to jump to this section from same page using a link or button. Eg. #design-pack-section"
+    },
+    {
+      "type": "checkbox",
+      "id": "override_theme_font",
+      "label": "Override default theme font",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Headings",
+      "default": "serif"
+    },
+    {
+      "type": "font_picker",
+      "id": "main_font",
+      "label": "Text",
+      "default": "sans-serif"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "scheduled_promotion",
+      "name": "Promotion",
+      "settings": [
+        {
+          "type": "select",
+          "id": "block_size",
+          "label": "Size",
+          "default": "small",
+          "options": [
+            {
+              "value": "horizontal",
+              "label": "Horizontal block"
+            },
+            {
+              "value": "vertical",
+              "label": "Vertical block"
+            },
+            {
+              "value": "big",
+              "label": "Big block"
+            },
+            {
+              "value": "small",
+              "label": "Small block"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "🎴 Front of card"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Background image"
+        },
+        {
+          "type": "richtext",
+          "id": "title",
+          "label": "Front text",
+          "default": "<h3>Day --</h3>"
+        },
+        {
+          "type": "color",
+          "id": "front_text_color",
+          "label": "Text",
+          "default": "#ffffff"
+        },
+        {
+          "type": "color_background",
+          "id": "front_text_background_color",
+          "label": "Overlay",
+          "default": "radial-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 1) 100%)"
+        },
+        {
+          "type": "header",
+          "content": "🃏 Back of card"
+        },
+        {
+          "type": "image_picker",
+          "id": "inset_image",
+          "label": "Back image"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+          "type": "range",
+          "id": "inset_image_size",
+          "label": "Image size",
+          "default": 10,
+          "min": 5,
+          "max": 100,
+          "step": 5,
+          "unit": "%"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Back text",
+          "default": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nibh enim, ornare at consequat sed, placerat quis libero. Curabitur id nulla ut nunc aliquam sodales.</p>"
+        },
+        {
+          "type": "liquid",
+          "id": "liquid",
+          "label": "HTML/Liquid"
+        },
+        {
+          "type": "color",
+          "id": "back_text_color",
+          "label": "Text",
+          "default": "#000000"
+        },
+        {
+          "type": "color",
+          "id": "back_text_background_color",
+          "label": "Text background",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "header",
+          "content": "🗓️ Scheduling",
+          "info": "This is when the promotion will become active. (optional)"
+        },
+        {
+          "type": "text",
+          "id": "date",
+          "label": "Active date",
+          "placeholder": "YYYY-MM-DD",
+          "info": "Disable clicking on promotion until this date. Date format is YYYY-MM-DD. Time is optional. Eg. YYYY-MM-DD 13:30. Promotion will be active for a 24hr period. If empty, the promotion will always be active."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Daily promotions - flip 🎒",
+      "blocks": [
+        {
+          "type": "scheduled_promotion",
+          "settings": {
+            "title": "<h3>Day 1</h3>",
+            "text": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nibh enim, ornare at consequat sed, placerat quis libero.</p>",
+            "block_size": "small"
+          }
+        },
+        {
+          "type": "scheduled_promotion",
+          "settings": {
+            "title": "<h3>Day 2</h3>",
+            "text": "<p>Curabitur id nulla ut nunc aliquam sodales.</p>",
+            "block_size": "vertical"
+          }
+        },
+        {
+          "type": "scheduled_promotion",
+          "settings": {
+            "title": "<h3>Day 3</h3>",
+            "text": "<p>Mauris nibh enim, ornare at consequat sed, placerat quis libero. Curabitur id nulla ut nunc aliquam sodales.</p>",
+            "block_size": "small"
+          }
+        },
+        {
+          "type": "scheduled_promotion",
+          "settings": {
+            "title": "<h3>Day 4</h3>",
+            "text": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur id nulla ut nunc aliquam sodales.</p>",
+            "block_size": "small"
+          }
+        },
+        {
+          "type": "scheduled_promotion",
+          "settings": {
+            "title": "<h3>Day 5</h3>",
+            "text": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris nibh enim, ornare at consequat sed, placerat quis libero.</p>",
+            "block_size": "small"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+{%- comment -%} JSON Settings {%- endcomment -%}
+<script type="application/json" data-dsgn-pck="{{ section_id }}">
+  {
+    "id": {{ section_id | json }},
+    "animation": {{ section.settings.animation | json }}
+  }
+</script>
+{%- comment -%} JavaScript {%- endcomment -%}
+<script data-dsgn-pck-js="{{ section_id }}" type="module" defer>
+(function(){
+
+  const designPack = {
+    settings: {},
+    animateSection: function(entries, observer){
+      // Target the first entry available.
+      let observedSection = entries[0];
+      if (observedSection.isIntersecting) {
+        observedSection.target.classList.add('dsgn-pck__animation-applied');
+      }
+    },
+    load: function(section){
+      var card = section.querySelectorAll('.dsgn-pck__card');
+
+      card.forEach(function(card) {
+        card.querySelector('.dsgn-pck__content--front').addEventListener( 'click', function() {
+          //console.log(this);
+          card.classList.toggle('dsgn-pck__flipped');
+        });
+
+        card.querySelector('[data-dsgn-pck-close]').addEventListener( 'click', function() {
+          card.classList.toggle('dsgn-pck__flipped');
+        });
+      });
+
+
+      if (this.settings.animation !== 'none'){
+        const options = {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0.3
+        };
+        // Construct Intersection Observer.
+        const observer = new IntersectionObserver( this.animateSection, options );
+        // Observe if element is present.
+        if (section) {
+          observer.observe(section);
+        }
+      }
+    },
+    unload: function(section){
+      section.classList.remove('dsgn-pck__animation-applied')
+    }
+  }
+
+  window.addEventListener('shopify:section:unload', function (e) {
+    const settings = document.querySelector(`[data-dsgn-pck="${e.detail.sectionId}"]`);
+    const sectionId = e.detail.sectionId;
+    const section = document.querySelector(`#DP--${e.detail.sectionId}`);
+    if (sectionId == designPack.settings.id){
+      designPack.unload(section);
+    }
+  });
+
+  designPack.settings = JSON.parse(document.querySelector('[data-dsgn-pck="{{ section_id }}"]').innerHTML);
+  const sectionId = {{ section_id | json }};
+  const section = document.querySelector(`#DP--${sectionId}`);
+
+  if (sectionId == designPack.settings.id){
+    designPack.load(section);
+  }
+})()
+</script>

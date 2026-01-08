@@ -1,0 +1,1071 @@
+{%- comment -%}
+{
+  "pack_name": "Gallery - thumbnails",
+  "pack_author": "Design Packs",
+  "license": "© Design Packs. All rights reserved. This code is protected by copyright law and may not be reproduced, distributed, or used without explicit permission from the author. Shopify complies with the Digital Millennium Copyright Act (DMCA) and responds to claims of copyright infringement using DMCA procedures, which could result in the termination of your Shopify account.",
+}
+{%- endcomment -%}
+
+{% comment %} Security Code - hides section when app uninstalled {% endcomment %}
+{%- unless content_for_header contains 'design_packs_file.js' -%}
+  {%- if request.design_mode -%}
+    <div class="dsgn-pck__no-app-warning">
+      <div class="dsgn-pck__no-app-warning-background">
+      </div>
+      <div class="dsgn-pck__no-app-warning-text dsgn-pck__rte">
+        <p><strong>WARNING!</strong> This premium section will not display properly without an active subscription for <a href="https://apps.shopify.com/design-packs" target="_blank" rel="noopener nofollow">Design Packs</a>. If you need any support please email <a href="mailto:info@design-packs.com" target="_blank" rel="noopener">info@design-packs.com</a> with your questions.</p>
+      </div>
+    </div>
+  {%- endif -%}
+  {%- break -%}
+{%- endunless -%}
+
+{%- comment -%} Assign: Preview section js fix {%- endcomment -%}
+{%- assign section_id = section.id | replace: '+', '' | replace: '=', '' -%}
+
+{%- comment -%} Color: check if color is set to transparent {%- endcomment -%}
+{%- assign button_alpha = section.settings.button_background_color | color_extract: 'alpha' -%}
+
+{%- comment -%} Images: a main placeholder {%- endcomment -%}
+{% capture main_placeholder_url %}jNPVlv8USYA_1080x600{% endcapture %}
+{%- assign main_placeholder_width = main_placeholder_url | split: '_' | last | split: 'x' | first -%}
+{%- assign main_placeholder_height = main_placeholder_url | split: '_' | last | split: 'x' | last -%}
+
+{%- comment -%} Images: check image crop aspect ratio {%- endcomment -%}
+{%- if section.settings.image_crop == 'none' -%}
+  {%- assign image_crop_width = section.blocks[0].settings.gallery_image.width -%}
+  {%- assign image_crop_height = section.blocks[0].settings.gallery_image.height -%}
+{%- else -%}
+  {%- assign image_crop_width = section.settings.image_crop | split: ':' | first | times: 1000 -%}
+  {%- assign image_crop_height = section.settings.image_crop | split: ':' | last | times: 1000 -%}
+{%- endif -%}
+
+{% comment %} Images: responsive image widths {% endcomment %}
+{%- assign widths = '180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 1950, 2100, 2260, 2450, 2700, 3000, 3350, 3750, 4100' -%}
+
+{%- comment -%} Layout: has user entered measurement value into max-width field? {%- endcomment -%}
+{%- if section.settings.max_width contains 'px' or section.settings.max_width contains '%' -%}
+  {%- assign max_width = section.settings.max_width -%}
+{%- else -%}
+  {%- assign max_width = section.settings.max_width | append: 'px' -%}
+{%- endif -%}
+
+{%- comment -%} Text: custom font_picker values {%- endcomment -%}
+{%- capture font_settings_list -%}
+{{ section.settings.main_font | font_face: font_display: 'swap' }}~
+{{ section.settings.main_font | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{{ section.settings.main_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}~
+{{ section.settings.main_font | font_modify: 'style', 'italic' | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_modify: 'style', 'italic' | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}
+{%- endcapture -%}
+{%- assign font_array = font_settings_list | split: '~' -%}
+
+{%- capture minify -%}
+{%- comment -%} CSS {%- endcomment -%}
+<style>
+{%- if section.settings.override_theme_font != blank -%}
+  {%- for font in font_array -%}
+    {%- unless font contains 'error' -%}{{ font }}{%- endunless -%}
+  {%- endfor -%}
+  .DP--{{ section_id }} {
+    --main-font: {{ section.settings.main_font.family }}, {{ section.settings.main_font.fallback_families }};
+    --main-font-weight: {{ section.settings.main_font.weight }};
+    --main-font-style: {{ section.settings.main_font.style }};
+    --heading-font: {{ section.settings.heading_font.family }}, {{ section.settings.heading_font.fallback_families }};
+    --heading-font-weight: {{ section.settings.heading_font.weight }};
+    --heading-font-style: {{ section.settings.heading_font.style }};
+  }
+{%- endif -%}
+
+.DP--{{ section_id }} {
+  margin-top: {{ section.settings.outer_margin }}px;
+  margin-bottom: {{ section.settings.outer_margin }}px;
+}
+
+.DP--{{ section_id }} .dsgn-pck__sizer {
+  padding-top: {{ section.settings.inner_padding }}px;
+  padding-bottom: {{ section.settings.inner_padding }}px;
+  width: {{ section.settings.base_width }}%;
+  max-width: {{ max_width }};
+}
+
+.DP--{{ section_id }} .dsgn-pck__background {
+  background: {{ section.settings.background_color }};
+}
+
+.DP--{{ section_id }} .dsgn-pck__text p:last-of-type {
+  margin-bottom: 1.2rem;
+}
+
+.DP--{{ section_id }} .dsgn-pck__block--gallery_image {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  cursor: pointer;
+}
+
+.DP--{{ section_id }} .dsgn-pck__content {
+  padding: 15px 0;
+  {%- if section.settings.text_background_color != blank -%}
+    padding: 15px;
+  {%- endif -%}
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--main-font);
+  font-weight: var(--main-font-weight);
+  font-style: var(--main-font-style);
+  {%- endif -%}
+  color: {{ section.settings.text_color }};
+  background: {{ section.settings.text_background_color }};
+}
+
+.DP--{{ section_id }} .dsgn-pck__inner-content {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(200px, 1fr));
+  grid-gap: 32px;
+  width: 100%;
+  margin: auto;
+}
+
+.DP--{{ section_id }} .dsgn-pck__gallery-thumbnails {
+  display: grid;
+  grid-template-columns: repeat({{ section.settings.grid_number }}, minmax(50px, 1fr));
+  grid-gap: 16px;
+  align-content: flex-start;
+}
+
+.DP--{{ section_id }} .dsgn-pck__heading {
+  line-height: var(--dp-g-heading-line-height, var(--dp-heading-line-height, calc(3px + 2ex + 3px)));
+  font-size: calc(var(--dp-g-heading-size, var(--dp-heading-size, 35px)) * {{ section.settings.text_size | times: 0.01 }});
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--heading-font);
+  font-weight: var(--heading-font-weight);
+  font-style: var(--heading-font-style);
+  {%- endif -%}
+}
+
+.DP--{{ section_id }} .dsgn-pck__heading + .dsgn-pck__text {
+  margin-top: calc(10px * {{ section.settings.text_size | times: 0.015 }});
+}
+
+.DP--{{ section_id }} .dsgn-pck__text p {
+  line-height: var(--dp-g-body-line-height, var(--dp-body-line-height, calc(3px + 2.5ex + 3px)));
+  font-size: calc(var(--dp-g-body-size, var(--dp-body-size, 18px)) * {{ section.settings.text_size | times: 0.01 }});
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--main-font);
+  font-weight: var(--main-font-weight);
+  font-style: var(--main-font-style);
+  {%- endif -%}
+}
+
+.DP--{{ section_id }} .dsgn-pck__text + .dsgn-pck__button {
+  margin-top: calc(10px * {{ section.settings.text_size | times: 0.02 }});
+}
+
+.DP--{{ section_id }} .dsgn-pck__button {
+  margin-top: 1.2em;
+  border-color: transparent;
+  display: inline-block;
+  text-decoration: none;
+  padding: 0.5em 1.2em;
+  transition: all 0.3s ease-in-out;
+  border: thin solid;
+  border-radius: {{ section.settings.button_radius }}px;
+  border-color: {%- if button_alpha != 0 -%}{{ section.settings.button_background_color }}{%- else -%}{{ section.settings.button_label_color }}{%- endif -%};
+  font-size: calc(var(--dp-g-body-size, var(--dp-body-size, 18px)) * {{ section.settings.text_size | times: 0.01 }});
+  color: {{ section.settings.button_label_color }};
+  background-color: {{ section.settings.button_background_color }};
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--main-font);
+  font-weight: var(--main-font-weight);
+  font-style: var(--main-font-style);
+  {%- endif -%}
+}
+
+.DP--{{ section_id }} .dsgn-pck__button:hover {
+  opacity: 1;
+  {%- if button_alpha != 0 -%}
+  background-color: {{ section.settings.button_background_color | color_darken: 10 }};
+  border-color: transparent;
+  {%- else -%}
+  background-color: {{ section.settings.button_label_color | color_modify: 'alpha', 0.1 }}
+  {%- endif -%};
+}
+
+.DP--{{ section_id }} .dsgn-pck__button::after {
+  display: none;
+}
+
+/* Animation */
+{%- if section.settings.animation != 'none' -%}
+  #DP--{{ section_id }}.dsgn-pck__animation-applied [style*="--dsgn-pck-animate"] {
+    animation-name: dsgn-pck__animation--{{ section.settings.animation }};
+  }
+{%- else -%}
+  .DP--{{ section_id }} [style*="--dsgn-pck-animate"] {
+    opacity: 1;
+  }
+{% endif %}
+
+{%- if section.settings.custom_css != blank -%}
+  {%- assign custom_section_declarations = section.settings.custom_css | split: '}' -%}
+  {%- for declaration in custom_section_declarations -%}
+    {%- if declaration contains '{' -%}
+      #DP--{{ section_id }} {{ declaration }} }
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+/* Landscape phones and down */
+@media (max-width: 480px) {
+  .DP--{{ section_id }} {
+    margin-top: {{ section.settings.outer_margin | divided_by: 2 }}px;
+    margin-bottom: {{ section.settings.outer_margin | divided_by: 2 }}px;
+  }
+
+  .DP--{{ section_id }} .dsgn-pck__sizer {
+    padding-top: {{ section.settings.inner_padding | divided_by: 2 }}px;
+    padding-bottom: {{ section.settings.inner_padding | divided_by: 2 }}px;
+    min-width: 80%;
+  }
+
+
+  .DP--{{ section_id }} .dsgn-pck__inner-content {
+    grid-template-columns: repeat(1, minmax(250px, 1fr));
+  }
+
+  .DP--{{ section_id }} .dsgn-pck__gallery-thumbnails {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.mobile_grid_number }}, minmax(50px, 1fr));
+    grid-gap: 12px;
+    align-content: flex-start;
+  }
+
+  .DP--{{ section_id }} div.dsgn-pck__button-area {
+    grid-template-columns: 1fr;
+    width: 100%;
+    gap: 10px;
+  }
+
+  {%- if section.settings.mobile_custom_css != blank -%}
+    {%- assign mobile_custom_declarations = section.settings.mobile_custom_css | split: '}' -%}
+    {%- for declaration in mobile_custom_declarations -%}
+      {%- if declaration contains '{' -%}
+        #DP--{{ section_id }} {{ declaration }} }
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+}
+</style>
+
+{%- comment -%} HTML {%- endcomment -%}
+<section id="DP--{{ section_id }}" class="DP--{{ section_id }} dsgn-pck__gallery-with-text-simple dsgn-pck__section">
+  {%- if section.settings.anchor_id != blank -%}
+    <div id="{{ section.settings.anchor_id | remove: '#' | handleize }}" class="dsgn-pck__anchor-id" style="height: 0; overflow: hidden;"></div>
+  {%- endif -%}
+  <div class="dsgn-pck__background">
+    <div class="dsgn-pck__sizer">
+      <div class="dsgn-pck__image">
+        <div class="dsgn-pck__main-image dsgn-pck__image__wrapper" style="--dsgn-pck-animate: 0;" data-dsgn-pck-main-image>
+          <svg class="dsgn-pck__svg-sizer" viewBox="0 0 {{ image_crop_width | default: main_placeholder_width }} {{ image_crop_height | default: main_placeholder_height }}"></svg>
+          {%- if section.blocks[0].settings.gallery_image != blank -%}
+            {%- capture sizes -%}
+              (max-width: 480px) {{ section.settings.base_width | append: 'vw' | default: '33vw' }}, {{ section.settings.base_width | append: 'vw' | default: '50vw' }}
+            {%- endcapture -%}
+            {{ section.blocks[0].settings.gallery_image | image_url: width: 2800 | image_tag:  widths: widths, sizes: sizes }}
+          {%- else -%}
+            <img src="https://cdn.shopify.com/s/files/1/0577/7673/4361/files/{{ main_placeholder_url }}.jpg"
+                alt=""
+                loading="lazy"
+                width="{{ main_placeholder_width }}"
+                height="{{ main_placeholder_height }}">
+          {%- endif -%}
+        </div>
+      </div>
+      <div class="dsgn-pck__content dsgn-pck__flex dsgn-pck__justify-{{ section.settings.text_alignment }}">
+        <div class="dsgn-pck__inner-content">
+          <div class="dsgn-pck__gallery-thumbnails">
+            {%- for block in section.blocks -%}
+              {% if block.type == "gallery_image" %}
+                <div id="DP--{{ block.id }}" class="dsgn-pck__block dsgn-pck__block--{{ block.type }}" {{ block.shopify_attributes }} style="--dsgn-pck-animate: {{ forloop.index }};">
+                  <style>
+                    #DP--{{ block.id }} .dsgn-pck__image__wrapper {
+                      width: 100%;
+                      display: inline-block;
+                    }
+
+                    #DP--{{ block.id }} .dsgn-pck__image__wrapper svg {
+                      width: 100%;
+                    }
+
+                    #DP--{{ block.id }} .dsgn-pck__item img {
+                      width: 100%;
+                      object-fit: contain;
+                    }
+                  </style>
+                    {%- comment -%} Images: all placeholders {%- endcomment -%}
+                    {% capture placeholder_url %}{% cycle "jNPVlv8USYA", "Pm0K9Y3EPUc", "VxAwTeiqDao", "0MoF-Fe0w0A" %}_1080x600{% endcapture %}
+                    {%- assign placeholder_width = placeholder_url | split: '_' | last | split: 'x' | first -%}
+                    {%- assign placeholder_height = placeholder_url | split: '_' | last | split: 'x' | last -%}
+
+                    {%- comment -%} Images: check image crop aspect ratio {%- endcomment -%}
+                    {%- if section.settings.image_crop == 'none' -%}
+                      {%- assign thumb_image_crop_width = block.settings.gallery_image.width | default: placeholder_width -%}
+                      {%- assign thumb_image_crop_height = block.settings.gallery_image.height | default: placeholder_height -%}
+                    {%- else -%}
+                      {%- assign thumb_image_crop_width = section.settings.image_crop | split: ':' | first | times: 1000 -%}
+                      {%- assign thumb_image_crop_height = section.settings.image_crop | split: ':' | last | times: 1000 -%}
+                    {%- endif -%}
+
+                    <div class="dsgn-pck__image__wrapper"
+                      data-dsgn-pck-image="{{ block.settings.gallery_image.src }}"
+                    >
+                      <svg viewBox="0 0 {{ thumb_image_crop_width }} {{ thumb_image_crop_height }}"></svg>
+                      {%- if block.settings.gallery_image != blank -%}
+                        {%- capture sizes -%}
+                          (max-width: 480px) {{ 100 | divided_by: section.settings.mobile_grid_number }}vw, {{ section.settings.base_width | divided_by: section.settings.grid_number | divided_by: 2 }}vw
+                        {%- endcapture -%}
+                        {{ block.settings.gallery_image | image_url: width: 2800 | image_tag:  widths: widths, sizes: sizes }}
+                      {%- else -%}
+                        <img src="https://cdn.shopify.com/s/files/1/0577/7673/4361/files/{{ placeholder_url }}.jpg"
+                            alt=""
+                            loading="lazy"
+                            width="{{ placeholder_width }}"
+                            height="{{ placeholder_height }}">
+                      {%- endif -%}
+                    </div>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+          <div class="dsgn-pck__text-content">
+          {%- for block in section.blocks -%}
+            <div id="DP--{{ block.id }}" class="dsgn-pck__block dsgn-pck__block--{{ block.type }}" {{ block.shopify_attributes }} style="--dsgn-pck-animate: {{ forloop.index }};">
+              {%- case block.type -%}
+                {%- when '@app' -%}
+                  {% render block %}
+                {%- when 'divider' -%}
+                  <style>
+                    #DP--{{ block.id }} {
+                      padding-top: {{ block.settings.padding_top }}px;
+                      padding-bottom: {{ block.settings.padding_bottom }}px;
+                    }
+
+                    #DP--{{ block.id }} .dsgn-pck__divider {
+                      height: 0;
+                      border: none;
+                      background: transparent;
+                      {%- if block.settings.alignment == 'left' -%}
+                        margin: 0;
+                      {%- elsif block.settings.alignment == 'right' -%}
+                        margin: 0 0 0 auto;
+                      {%- else -%}
+                        margin: 0 auto;
+                      {%- endif -%}
+                      width: {{ block.settings.base_width }}%;
+                      border-top: {{ block.settings.thickness }}px {{ block.settings.style }} {{ block.settings.divider_color }};
+                    }
+                  </style>
+                  <hr class="dsgn-pck__divider" aria-hidden="true">
+
+                {%- when 'small_text' -%}
+                  {%- if block.settings.small_text != blank -%}
+                    <div class="dsgn-pck__small-text dsgn-pck__rte">
+                      {{ block.settings.small_text }}
+                    </div>
+                  {%- endif -%}
+                {%- when 'heading' -%}
+                  {%- if block.settings.title != blank -%}
+                    <h2 class="dsgn-pck__heading">
+                      {{ block.settings.title | newline_to_br }}
+                    </h2>
+                  {%- endif -%}
+                {%- when 'text' -%}
+                  {%- if block.settings.text != blank -%}
+                    <div class="dsgn-pck__text dsgn-pck__rte">
+                      {{ block.settings.text }}
+                    </div>
+                  {%- endif -%}
+                {%- when 'buttons' -%}
+                  <style>
+                    {%- assign button_alpha_primary = block.settings.button_background_color_primary | color_extract: 'alpha' -%}
+                    {%- assign button_alpha_secondary = block.settings.button_background_color_secondary | color_extract: 'alpha' -%}
+
+                    .DP--{{ section_id }} .dsgn-pck__button-area {
+                      display: grid;
+                      grid-gap: 16px;
+
+                      {%- if section.settings.text_alignment == 'center' -%}
+                        margin: 0 auto;
+                      {%- elsif section.settings.text_alignment == 'right' -%}
+                        margin: 0 0 0 auto;
+                      {%- else -%}
+                      {%- endif -%}
+                      margin-bottom: 1.2rem;
+                      {%- if block.settings.button_label_primary != blank and block.settings.button_label_secondary != blank -%}
+                        grid-template-columns: repeat(2, 1fr);
+                      {%- else -%}
+                        grid-template-columns: 1fr;
+                        max-width: 200px;
+                      {%- endif -%}
+                      max-width: 100%;
+                      width: fit-content;
+                    }
+
+                    .DP--{{ section_id }} .dsgn-pck__button {
+                      display: flex;
+                      justify-content: center;
+                      align-items: center;
+                      text-align: center;
+                      text-decoration: none;
+                      padding: var(--dp-button-padding, 0.5em 1.2em);
+                      margin-top: 0;
+                      border: thin solid;
+                      transition: all 0.3s ease-in-out;
+                      border-radius: {{ block.settings.button_radius }}px;
+                      line-height: var(--dp-g-button-line-height, var(--dp-button-line-height, calc(3px + 2ex + 3px)));
+                      font-size: calc(var(--dp-g-body-size, var(--dp-body-size, 18px)) * {{ section.settings.text_size | times: 0.01 }});
+                      {%- if section.settings.override_theme_font != blank -%}
+                      font-family: var(--main-font);
+                      font-weight: var(--main-font-weight);
+                      font-style: var(--main-font-style);
+                      {%- endif -%}
+                    }
+
+                    .DP--{{ section_id }} .dsgn-pck__button-primary {
+                      color: {{ block.settings.button_label_color_primary }};
+                      border-color: {%- if button_alpha_primary != 0 -%}{{ block.settings.button_background_color_primary }}{%- else -%}{{ block.settings.button_label_color_primary }}{%- endif -%};
+                      background-color: {{ block.settings.button_background_color_primary }};
+                    }
+
+                    .DP--{{ section_id }} .dsgn-pck__button-secondary {
+                      color: {{ block.settings.button_label_color_secondary }};
+                      border-color: {%- if button_alpha_secondary != 0 -%}{{ block.settings.button_background_color_secondary }}{%- else -%}{{ block.settings.button_label_color_secondary }}{%- endif -%};
+                      background-color: {{ block.settings.button_background_color_secondary }};
+                    }
+
+                    .DP--{{ section_id }} .dsgn-pck__button-primary:hover {
+                      opacity: 1;
+                      {%- if button_alpha_primary != 0 -%}
+                      background-color: {{ block.settings.button_background_color_primary | color_darken: 10 }};
+                      border-color: transparent;
+                      {%- else -%}
+                      background-color: {{ block.settings.button_label_color_primary | color_modify: 'alpha', 0.1 }}
+                      {%- endif -%};
+                    }
+
+                    .DP--{{ section_id }} .dsgn-pck__button-secondary:hover {
+                      opacity: 1;
+                      {%- if button_alpha_secondary != 0 -%}
+                      background-color: {{ block.settings.button_background_color_secondary | color_darken: 10 }};
+                      border-color: transparent;
+                      {%- else -%}
+                      background-color: {{ block.settings.button_label_color_secondary | color_modify: 'alpha', 0.1 }}
+                      {%- endif -%};
+                    }
+                  </style>
+                  <div class="dsgn-pck__button-area">
+                    {%- if block.settings.button_label_primary != blank -%}
+                      <a class="dsgn-pck__button dsgn-pck__button-primary" {%- if block.settings.link_primary != blank -%} href="{{ block.settings.link_primary }}" {%- endif -%}>{{ block.settings.button_label_primary }}</a>
+                    {%- endif -%}
+                    {%- if block.settings.button_label_secondary != blank -%}
+                      <a class="dsgn-pck__button dsgn-pck__button-secondary" {%- if block.settings.link_secondary != blank -%}href="{{ block.settings.link_secondary }}"{%- endif -%}>{{ block.settings.button_label_secondary }}</a>
+                    {%- endif -%}
+                  </div>
+              {%- endcase -%}
+            </div>
+          {%- endfor -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{%- endcapture -%}
+{{ minify | strip_newlines }}
+
+{% schema %}
+{
+  "name": "Gallery - thumbnails",
+  "class": "DP__gallery-thumbnails",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Gallery"
+    },
+    {
+      "type": "select",
+      "id": "image_crop",
+      "label": "Image aspect ratio",
+      "default": "none",
+      "options": [
+        {
+          "value": "16:9",
+          "label": "Cinema (16:9)"
+        },
+        {
+          "value": "4:3",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "2:3",
+          "label": "Portrait (2:3)"
+        },
+        {
+          "value": "1:1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "none",
+          "label": "Original"
+        }
+      ]
+    },
+    {
+      "type": "range",
+      "id": "grid_number",
+      "label": "Thumbnails per row",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 2
+    },
+    {
+      "type": "select",
+      "id": "mobile_grid_number",
+      "label": "Thumbnails per row (mobile)",
+      "default": "2",
+      "options": [
+        {
+          "value": "2",
+          "label": "2"
+        },
+        {
+          "value": "3",
+          "label": "3"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "✏️ Text appearance"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 80,
+      "max": 150,
+      "step": 5,
+      "default": 90,
+      "unit": "%"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Text alignment",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        },
+        {
+          "value": "justify",
+          "label": "Justify"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "🎨 Design"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#121212"
+    },
+    {
+      "type": "color_background",
+      "id": "text_background_color",
+      "label": "Text background"
+    },
+    {
+      "type": "color_background",
+      "id": "background_color",
+      "label": "Background"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Animation",
+      "default": "none",
+      "options": [
+        {
+          "value": "fade-in",
+          "label": "Fade-in"
+        },
+        {
+          "value": "fade-in-left",
+          "label": "Fade-in left"
+        },
+        {
+          "value": "fade-in-right",
+          "label": "Fade-in right"
+        },
+        {
+          "value": "fade-in-up",
+          "label": "Fade-in up"
+        },
+        {
+          "value": "fade-in-down",
+          "label": "Fade-in down"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "🖼 Layout"
+    },
+    {
+      "type": "range",
+      "id": "base_width",
+      "label": "Size",
+      "min": 60,
+      "max": 100,
+      "step": 5,
+      "default": 60,
+      "unit": "%"
+    },
+    {
+      "type": "text",
+      "id": "max_width",
+      "label": "Maximum width",
+      "placeholder": "eg. 1200px",
+      "info": "Sets width constraint for content."
+    },
+    {
+      "type": "range",
+      "id": "inner_padding",
+      "label": "Inner padding",
+      "info": "Only applies to top and bottom.",
+      "min": 0,
+      "max": 100,
+      "default": 60,
+      "step": 5,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "outer_margin",
+      "label": "Outer margin",
+      "info": "Only applies to top and bottom.",
+      "min": 0,
+      "max": 100,
+      "default": 0,
+      "step": 5,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "🚨 Advanced"
+    },
+    {
+      "type": "liquid",
+      "id": "custom_css",
+      "label": "CSS"
+    },
+    {
+      "type": "liquid",
+      "id": "mobile_custom_css",
+      "label": "Mobile CSS",
+      "info": "Applied on screens less than 480px."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Link anchor id",
+      "placeholder": "#design-pack-section",
+      "info": "Enter a unique value to jump to this section from same page using a link or button. Eg. #design-pack-section [Learn more](https://app.gitbook.com/o/UwqKbTxsdQExehd4SSPM/s/iJpf70jLagzGk8zoz4fu/fundamentals/how-to-guides/how-to-jump-link-to-another-section-on-the-same-page)"
+    },
+    {
+      "type": "checkbox",
+      "id": "override_theme_font",
+      "label": "Override default theme font",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Heading",
+      "default": "serif"
+    },
+    {
+      "type": "font_picker",
+      "id": "main_font",
+      "label": "Text",
+      "default": "sans-serif"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "gallery_image",
+      "name": "Gallery image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "gallery_image",
+          "label": "Image"
+        }
+      ]
+    },
+    {
+      "type": "small_text",
+      "name": "Small text",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "small_text",
+          "label": "Small text",
+          "default": "<p>Bestsellers</p>"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Bestsellers"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Regular text",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Great for featuring a new collection release. Click on thumbnails to show larger images.</p>"
+        }
+      ]
+    },
+    {
+      "type": "buttons",
+      "name": "Buttons",
+      "settings": [
+        {
+          "type": "range",
+          "id": "button_radius",
+          "label": "Button border radius",
+          "min": 0,
+          "max": 50,
+          "default": 0,
+          "unit": "px"
+        },
+        {
+          "type": "text",
+          "id": "button_label_primary",
+          "label": "Primary button",
+          "default": "Learn more"
+        },
+        {
+          "type": "url",
+          "id": "link_primary",
+          "label": "Primary link"
+        },
+        {
+          "type": "color",
+          "id": "button_label_color_primary",
+          "label": "Primary button label",
+          "default": "#121212"
+        },
+        {
+          "type": "color",
+          "id": "button_background_color_primary",
+          "label": "Primary button background",
+          "default": "rgba(0,0,0,0)"
+        },
+        {
+          "type": "text",
+          "id": "button_label_secondary",
+          "label": "Secondary button",
+          "default": "Shop now"
+        },
+        {
+          "type": "url",
+          "id": "link_secondary",
+          "label": "Secondary link"
+        },
+        {
+          "type": "color",
+          "id": "button_label_color_secondary",
+          "label": "Secondary button label",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "button_background_color_secondary",
+          "label": "Secondary button background",
+          "default": "#121212"
+        }
+      ]
+    },
+    {
+      "type": "divider",
+      "name": "Divider",
+      "settings": [
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Alignment",
+          "default": "left",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "base_width",
+          "label": "Width",
+          "min": 20,
+          "max": 100,
+          "step": 5,
+          "default": 50,
+          "unit": "%"
+        },
+        {
+          "type": "range",
+          "id": "thickness",
+          "label": "Thickness",
+          "min": 0,
+          "max": 10,
+          "default": 1,
+          "unit": "px"
+        },
+        {
+          "type": "select",
+          "id": "style",
+          "label": "Style",
+          "default": "solid",
+          "options": [
+            {
+              "value": "solid",
+              "label": "Solid line"
+            },
+            {
+              "value": "dotted",
+              "label": "Dotted line"
+            },
+            {
+              "value": "dashed",
+              "label": "Dashed line"
+            },
+            {
+              "value": "double",
+              "label": "Double line"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "🎨 Design"
+        },
+        {
+          "type": "color",
+          "id": "divider_color",
+          "label": "Color",
+          "default": "#121212"
+        },
+        {
+          "type": "header",
+          "content": "🖼 Layout"
+        },
+        {
+          "type": "range",
+          "id": "padding_top",
+          "label": "Padding - top",
+          "min": 0,
+          "max": 100,
+          "default": 40,
+          "step": 5,
+          "unit": "px"
+        },
+        {
+          "type": "range",
+          "id": "padding_bottom",
+          "label": "Padding - bottom",
+          "min": 0,
+          "max": 100,
+          "default": 40,
+          "step": 5,
+          "unit": "px"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gallery - thumbnails 🎒",
+      "settings": {
+      },
+      "blocks": [
+        {
+          "type": "gallery_image"
+        },
+        {
+          "type": "gallery_image"
+        },
+        {
+          "type": "gallery_image"
+        },
+        {
+          "type": "gallery_image"
+        },
+        {
+          "type": "heading"
+        },
+        {
+          "type": "text"
+        },
+        {
+          "type": "buttons",
+          "settings": {
+            "button_radius": 0,
+            "button_label_primary": "Shop Collection",
+            "link_primary": "",
+            "button_label_color_primary": "#121212",
+            "button_background_color_primary": "rgba(0,0,0,0)",
+            "button_label_secondary": "",
+            "link_secondary": "",
+            "button_label_color_secondary": "#FFFFFF",
+            "button_background_color_secondary": "#121212"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+{%- comment -%} JSON Settings {%- endcomment -%}
+<script type="application/json" data-dsgn-pck="{{ section_id }}">
+  {
+    "id": {{ section_id | json }},
+    "animation": {{ section.settings.animation | json }}
+  }
+</script>
+
+{%- comment -%} JavaScript {%- endcomment -%}
+<script data-dsgn-pck-js="{{ section_id }}" type="module" defer>
+(function(){
+
+  const designPack = {
+    settings: {},
+    changeImage: function(e, main_image, main_image_svg, thumbnail_image){
+      const image_path = e.currentTarget.src;
+      const image_srcset = e.currentTarget.srcset;
+      const sibling = thumbnail_image.previousElementSibling;
+      const sibling_viewbox = sibling.viewBox;
+      main_image.src = image_path;
+      main_image.srcset = image_srcset;
+      main_image_svg.viewBox.baseVal.height = sibling_viewbox.baseVal.height;
+      main_image_svg.viewBox.baseVal.width = sibling_viewbox.baseVal.width;
+    },
+    animateSection: function(entries, observer){
+      // Target the first entry available.
+      let observedSection = entries[0];
+      if (observedSection.isIntersecting) {
+        observedSection.target.classList.add('dsgn-pck__animation-applied');
+      }
+    },
+    load: function(section){
+      const main_image = section.querySelector('[data-dsgn-pck-main-image] img')
+      const main_image_svg = section.querySelector('[data-dsgn-pck-main-image] svg')
+      // Grab all the thumbnails
+      const thumbnail_images = section.querySelectorAll('[data-dsgn-pck-image] img');
+      // Setup thumbnail listener
+      thumbnail_images.forEach(function(thumbnail_image) {
+        thumbnail_image.addEventListener('click', function(event){
+          designPack.changeImage(event, main_image, main_image_svg, thumbnail_image);
+        });
+      });
+
+      if (this.settings.animation !== 'none'){
+        const options = {
+          root: null,
+          rootMargin: '0px',
+          threshold: [0, 0.25, 0.5, 0.75, 1]
+        };
+        // Construct Intersection Observer.
+        const observer = new IntersectionObserver( this.animateSection, options );
+        // Observe if element is present.
+        if (section) {
+          observer.observe(section);
+        }
+      }
+    },
+    unload: function(section){
+      section.classList.remove('dsgn-pck__animation-applied');
+      const thumbnail_images = section.querySelectorAll('[data-dsgn-pck-image] img');
+      thumbnail_images.forEach(function(thumbnail_image) {
+        thumbnail_image.removeEventListener('click', designPack.changeImage);
+      });
+    }
+  }
+
+  window.addEventListener('shopify:section:unload', function (e) {
+    const settings = document.querySelector(`[data-dsgn-pck="${e.detail.sectionId}"]`);
+    const sectionId = e.detail.sectionId;
+    const section = document.querySelector(`#DP--${e.detail.sectionId}`);
+    if (sectionId == designPack.settings.id){
+      designPack.unload(section);
+    }
+  });
+
+  designPack.settings = JSON.parse(document.querySelector('[data-dsgn-pck="{{ section_id }}"]').innerHTML);
+  const sectionId = {{ section_id | json }};
+  const section = document.querySelector(`#DP--${sectionId}`);
+
+  if (sectionId == designPack.settings.id){
+    designPack.load(section);
+  }
+})()
+</script>

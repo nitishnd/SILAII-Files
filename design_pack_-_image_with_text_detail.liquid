@@ -1,0 +1,819 @@
+{%- comment -%}
+{
+  "pack_name": "Image with text - detail",
+  "pack_author": "Design Packs",
+  "pack_version": "1.0.0",
+  "pack_folder": "section",
+  "pack_type": "dynamic",
+  "pack_tags": ["section", "animation"],
+  "pack_description": "Show some personality!"
+}
+{%- endcomment -%}
+
+{% comment %} Security Code - hides section when app uninstalled {% endcomment %}
+{%- unless content_for_header contains 'design_packs_file.js' -%}
+  {%- if request.design_mode -%}
+    <div class="dsgn-pck__no-app-warning">
+      <div class="dsgn-pck__no-app-warning-background">
+      </div>
+      <div class="dsgn-pck__no-app-warning-text dsgn-pck__rte">
+        <p><strong>WARNING!</strong> This premium section will not display properly without an active subscription for <a href="https://apps.shopify.com/design-packs" target="_blank" rel="nofollow">Design Packs</a>. If you need any support please email <a href="mailto:info@design-packs.com" target="_blank">info@design-packs.com</a> with your questions.</p>
+      </div>
+    </div>
+  {%- endif -%}
+  {%- break -%}
+{%- endunless -%}
+
+{%- comment -%} Color: check if color is set to transparent {%- endcomment -%}
+{%- assign background_alpha = section.settings.background_color | color_extract: 'alpha' -%}
+
+{%- comment -%} Layout: has user entered measurement value into max-width field? {%- endcomment -%}
+{%- if section.settings.max_width contains 'px' or section.settings.max_width contains '%' -%}
+  {%- assign max_width = section.settings.max_width -%}
+{%- else -%}
+  {%- assign max_width = section.settings.max_width | append: 'px' -%}
+{%- endif -%}
+
+{%- comment -%} Text: custom font_picker values {%- endcomment -%}
+{%- capture font_settings_list -%}
+{{ section.settings.main_font | font_face: font_display: 'swap' }}~
+{{ section.settings.main_font | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{{ section.settings.main_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}~
+{{ section.settings.main_font | font_modify: 'style', 'italic' | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_modify: 'style', 'italic' | font_face: font_display: 'swap' }}~
+{{ section.settings.heading_font | font_modify: 'style', 'italic' | font_modify: 'weight', 'bolder' | font_face: font_display: 'swap' }}~
+{%- endcapture -%}
+{%- assign font_array = font_settings_list | split: '~' -%}
+
+{%- capture minify -%}
+{%- comment -%} CSS {%- endcomment -%}
+<style>
+{%- if section.settings.override_theme_font != blank -%}
+  {%- for font in font_array -%}
+    {%- unless font contains 'error' -%}{{ font }}{%- endunless -%}
+  {%- endfor -%}
+  {%- capture main_font -%}{{ section.settings.main_font.family }}, {{ section.settings.main_font.fallback_families }}{%- endcapture -%}
+  {%- capture heading_font -%}{{ section.settings.heading_font.family }}, {{ section.settings.heading_font.fallback_families }}{%- endcapture -%}
+  {%- capture signature_font -%}{{ section.settings.signature_font.family }}, {{ section.settings.signature_font.fallback_families }}{%- endcapture -%}
+{%- endif -%}
+
+#DP--{{ section.id }} {
+  overflow: visible;
+  margin-bottom: {{ section.settings.outer_margin }}px;
+  margin-top: {{ section.settings.outer_margin }}px;
+}
+
+#DP--{{ section.id }} .dsgn-pck__sizer {
+  padding-top: 0;
+  width: {{ section.settings.base_width }}%;
+  max-width: {{ max_width }};
+}
+
+/* NOTE: leave the - - out of the liquid conditionals for the linear-gradients :) */
+
+#DP--{{ section.id }} .dsgn-pck__overlap-images--block-1 {
+  background: linear-gradient(
+    to bottom,
+    {{ section.settings.background_color_2 }},
+    {{ section.settings.background_color_2 }} {% if section.settings.blurred_edges %}6%{% else %}15%{% endif %},
+    {% if background_alpha != 0 %}{{ section.settings.background_color }}{% endif %} 15%
+  );
+}
+
+#DP--{{ section.id }} .dsgn-pck__overlap-images--block-1  .dsgn-pck__button {
+  justify-content: flex-end;
+}
+#DP--{{ section.id }} .dsgn-pck__overlap-images--block-2  .dsgn-pck__button {
+  justify-content: flex-start;
+}
+
+#DP--{{ section.id }} .dsgn-pck__overlap-images--block-2 {
+  background: linear-gradient(
+    to bottom,
+    {%- if background_alpha != 0 -%}{{ section.settings.background_color }}{% endif %} ,
+    {%- if background_alpha != 0 -%}{{ section.settings.background_color }}{% endif %}  85%,
+    {{ section.settings.background_color_2 }} {% if section.settings.blurred_edges %}94%{% else %}85%{% endif %}
+  );
+}
+
+#DP--{{ section.id }} .dsgn-pck__overlap-images--right .dsgn-pck__grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  align-items: center;
+}
+
+#DP--{{ section.id }} .dsgn-pck__overlap-images--left .dsgn-pck__grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  align-items: center;
+}
+
+#DP--{{ section.id }} .dsgn-pck__content {
+  flex: 1 0 50%;
+  color: {{ section.settings.text_color }};
+}
+
+#DP--{{ section.id }} .dsgn-pck__overlap-images--right .dsgn-pck__content {
+  padding-top:  0;
+  max-width: 50%;
+  justify-self: flex-start;
+  text-align:  right;
+}
+
+#DP--{{ section.id }} .dsgn-pck__overlap-images--left .dsgn-pck__content {
+  padding-top:  0;
+  max-width: 50%;
+  justify-self: flex-end;
+  text-align:  left;
+  order: 2;
+}
+
+#DP--{{ section.id }} .dsgn-pck__overlap-images--right .dsgn-pck__image::after {
+  content: "";
+  height: 1px;
+  width: 80%;
+  position: absolute;
+  top: 50%;
+  left: -90%;
+  transform: translateY(-50%);
+  background: {{ section.settings.text_color }};
+}
+
+#DP--{{ section.id }} .dsgn-pck__overlap-images--left .dsgn-pck__image::after {
+  content: "";
+  height: 1px;
+  width: 80%;
+  position: absolute;
+  top: 50%;
+  right: -90%;
+  transform: translateY(-50%);
+  background: {{ section.settings.text_color }};
+}
+
+#DP--{{ section.id }} .dsgn-pck__image {
+  position: relative;
+  flex: 1 0 50%;
+  color: inherit;
+  box-shadow: rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset, rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+}
+
+#DP--{{ section.id }} .dsgn-pck__image::before {
+  background-color: var(--image-background);
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  opacity: 0.4;
+}
+
+#DP--{{ section.id }} .dsgn-pck__image__wrapper img {
+  object-position: {{ section.settings.focal_point }};
+}
+
+#DP--{{ section.id }} .dsgn-pck__heading {
+  line-height: calc(3px + 2ex + 3px);
+  color: {{ section.settings.text_color }};
+  font-size: calc(var(--dp-g-heading-size, var(--dp-heading-size, 35px)) * {{ section.settings.text_size | times: 0.01 }});
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: {{ heading_font }};
+  font-weight: {{ section.settings.heading_font.weight }};
+  font-style: {{ section.settings.heading_font.style }};
+  {%- endif -%}
+}
+
+#DP--{{ section.id }} .dsgn-pck__heading + .dsgn-pck__text {
+  margin-top: calc(10px * {{ section.settings.text_size | times: 0.008 }});
+}
+
+#DP--{{ section.id }} .dsgn-pck__text {
+  color: {{ section.settings.text_color }};
+  line-height: calc(3px + 3ex + 3px);
+  font-size: calc(var(--dp-g-body-size, var(--dp-body-size, 18px)) * {{ section.settings.text_size | times: 0.01 }});
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: {{ main_font }};
+  font-weight: {{ section.settings.main_font.weight }};
+  font-style: {{ section.settings.main_font.style }};
+  {%- endif -%}
+}
+
+#DP--{{ section.id }} .dsgn-pck__text + .dsgn-pck__button {
+  margin-top: calc(10px * {{ section.settings.text_size | times: 0.008 }});
+}
+
+#DP--{{ section.id }} .dsgn-pck__button {
+  display: flex;
+  transition: 0.3s;
+  text-decoration: none;
+  color: {{ section.settings.text_color }};
+  font-size: calc(var(--dp-g-body-size, var(--dp-body-size, 18px)) * {{ section.settings.text_size | times: 0.01 }});
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: {{ main_font }};
+  font-weight: {{ section.settings.main_font.weight }};
+  font-style: {{ section.settings.main_font.style }};
+  {%- endif -%}
+}
+
+#DP--{{ section.id }} .dsgn-pck__arrow {
+  margin-left: 6px;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 1, 1);
+}
+
+#DP--{{ section.id }} .dsgn-pck__button:hover .dsgn-pck__arrow {
+  transform: translateX(3px);
+}
+
+#DP--{{ section.id }} .dsgn-pck__vertical-text {
+  line-height: 0.8;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  writing-mode: vertical-lr;
+  text-orientation: upright;
+  padding: 5%;
+  z-index: 1;
+  color: {{ section.settings.vertical_text_color }};
+  font-size: calc(var(--dp-g-body-size, var(--dp-body-size, 18px)) * {{ section.settings.text_size | times: 0.01 }});
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: {{ main_font }};
+  font-weight: {{ section.settings.main_font.weight }};
+  font-style: {{ section.settings.main_font.style }};
+  {%- endif -%}
+}
+
+#DP--{{ section.id }} .dsgn-pck__overlap-images--right .dsgn-pck__vertical-text {
+  right: 0;
+}
+
+#DP--{{ section.id }} .dsgn-pck__overlap-images--left .dsgn-pck__vertical-text {
+  left: 0;
+}
+
+/* Animation */
+{%- if section.settings.animation != 'none' -%}
+  #DP--{{ section.id }}.dsgn-pck__animation-applied [style*="--dsgn-pck-animate"] {
+    animation-name: dsgn-pck__animation--{{ section.settings.animation }};
+  }
+{%- else -%}
+  #DP--{{ section.id }} [style*="--dsgn-pck-animate"] {
+    opacity: 1;
+  }
+{% endif %}
+
+{%- if section.settings.custom_css != blank -%}
+  {%- assign custom_section_declarations = section.settings.custom_css | split: '}' -%}
+  {%- for declaration in custom_section_declarations -%}
+    {%- if declaration contains '{' -%}
+      #DP--{{ section.id }} {{ declaration }} }
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+/* Landscape phone to portrait tablet */
+@media (max-width: 767px) {
+  #DP--{{ section.id }} .dsgn-pck__content {
+    padding: 2em;
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__overlap-images--block-1  {
+    padding: 10% 0 15% 0;
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__overlap-images--block-2 {
+    padding: 10% 0 15% 0;
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__overlap-images--right .dsgn-pck__image::after {
+    width: 30%;
+    left: -20%;
+    z-index: 1;
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__overlap-images--left .dsgn-pck__image::after {
+    width: 30%;
+    right: -20%;
+    z-index: 1;
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__overlap-images .dsgn-pck__content {
+    max-width: 70%;
+    padding: 0;
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__overlap-images .dsgn-pck__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Landscape phones and down */
+@media (max-width: 480px) {
+  {%- if section.settings.vertical_text != blank -%}
+    #DP--{{ section.id }} .dsgn-pck__image .dsgn-pck__image__wrapper {
+      max-width: 90%;
+      margin: 0 auto;
+    }
+  {%- endif -%}
+
+  #DP--{{ section.id }} {
+    margin-top: {{ section.settings.outer_margin | divided_by: 2 }}px;
+    margin-bottom: {{ section.settings.outer_margin | divided_by: 2 }}px;
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__sizer {
+    min-width: 70%;
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__overlap-images .dsgn-pck__grid {
+    grid-template-columns: 1fr;
+    grid-gap: 80px;
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__overlap-images .dsgn-pck__content  {
+    max-width:  100%;
+    padding: 0;
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__overlap-images--right .dsgn-pck__content  {
+    order: 1;
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__overlap-images--left .dsgn-pck__image {
+    order: 2;
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__overlap-images--left .dsgn-pck__image::after {
+    height: 100px;
+    width: 2px;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  #DP--{{ section.id }} .dsgn-pck__overlap-images--right .dsgn-pck__image::after {
+    height: 100px;
+    width: 2px;
+    top: 90%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  {%- if section.settings.mobile_custom_css != blank -%}
+    {%- assign mobile_custom_declarations = section.settings.mobile_custom_css | split: '}' -%}
+    {%- for declaration in mobile_custom_declarations -%}
+      {%- if declaration contains '{' -%}
+        #DP--{{ section.id }} {{ declaration }} }
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+}
+</style>
+
+{%- comment -%} HTML {%- endcomment -%}
+<section id="DP--{{ section.id }}" class="DP--{{ section.id }} dsgn-pck__image-with-text-detail dsgn-pck__section">
+
+{%- for block in section.blocks -%}
+
+  {%- comment -%} Images: all placeholders {%- endcomment -%}
+  {%- assign placeholder_image_id_1 = 'juESZxMhtXk' -%}
+  {%- assign placeholder_image_id_2 = 'k6aQzmIbR1s' -%}
+  {%- assign placeholder_image_id_default = 'WF0LSThlRmw' -%}
+
+  {%- comment -%} Images: check image crop aspect ratio {%- endcomment -%}
+  {%- if section.settings.image_crop == 'none' -%}
+    {%- assign image_crop_width = block.settings.image.width | default: '1000' -%}
+    {%- assign image_crop_height = block.settings.image.height | default: '1200' -%}
+  {%- else -%}
+    {%- assign image_crop_width = block.settings.image_crop | split: ':' | first | times: 1000 -%}
+    {%- assign image_crop_height = block.settings.image_crop | split: ':' | last | times: 1000 -%}
+  {%- endif -%}
+
+  {%- capture placeholder_image_id -%}
+    {%- case forloop.index -%}
+      {%- when 1 -%}
+        {{ placeholder_image_id_1 }}
+      {%- when 2 -%}
+        {{ placeholder_image_id_2 }}
+      {%- else -%}
+        {{ placeholder_image_id_default }}
+    {%- endcase -%}
+  {%- endcapture -%}
+
+
+
+  {% comment %} Block {% endcomment %}
+  <div class="dsgn-pck__overlap-images {% if forloop.index == 1 %}dsgn-pck__overlap-images--right {% else %} dsgn-pck__overlap-images--left {% endif %} dsgn-pck__overlap-images--block-{{ forloop.index }}" {{ block.shopify_attributes }}>
+    <div class="dsgn-pck__sizer">
+      <div class="dsgn-pck__grid">
+        <div class="dsgn-pck__content">
+          <div class="dsgn-pck__inner-content" style="--dsgn-pck-animate: {{ forloop.index }};">
+            {%- if block.settings.title != blank -%}
+              <h2 class="dsgn-pck__heading dsgn-pck__heading">
+                {{ block.settings.title }}
+              </h2>
+            {%- endif -%}
+            {%- if block.settings.text != blank -%}
+              <div class="dsgn-pck__text dsgn-pck__text dsgn-pck__rte">
+                {{ block.settings.text }}
+              </div>
+            {%- endif -%}
+            {%- if block.settings.button_label != blank -%}
+              <a class="dsgn-pck__button dsgn-pck__button" href="{{ block.settings.button_link }}"><span>{{ block.settings.button_label }}</span><span class="dsgn-pck__arrow"> →</span></a>
+            {%- endif -%}
+          </div>
+        </div>
+        <div class="dsgn-pck__image" {%- if block.settings.image_overlay_color != blank -%}style="--image-background: {{ block.settings.image_overlay_color }}"{%- endif -%}>
+          <div class="dsgn-pck__image__wrapper">
+            <svg viewBox="0 0 {{ image_crop_width }} {{ image_crop_height }}"></svg>
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | image_url: width: 2800 | image_tag: loading: 'lazy' }}
+            {%- else -%}
+              <picture>
+                <img src="https://cdn.shopify.com/s/files/1/0577/7673/4361/files/{{ placeholder_image_id }}.jpg"
+                alt=""
+                loading="lazy"
+                width="800"
+                height="1200">
+              </picture>
+            {%- endif -%}
+            {%- if block.settings.vertical_text != blank -%}
+              <div class="dsgn-pck__vertical-text" style="color: {{ block.settings.vertical_text_color }}">
+                {{ block.settings.vertical_text }}
+              </div>
+            {%- endif -%}
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div><!-- end block -->
+
+{% endfor %}
+
+</section>
+
+{%- endcapture -%}
+{{ minify | strip_newlines }}
+
+{% schema %}
+{
+  "name": "Image with text - detail",
+  "class": "DP__image-with-text-detail",
+  "max_blocks": 2,
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "blurred_edges",
+      "label": "Blurred background edges",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "✏️ Text appearance"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 80,
+      "max": 120,
+      "step": 5,
+      "default": 100,
+      "unit": "%"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Design"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#373E40"
+    },
+    {
+      "type": "color",
+      "id": "background_color_2",
+      "label": "Background edge",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "select",
+      "id": "animation",
+      "label": "Animation",
+      "default": "fade-in",
+      "options": [
+        {
+          "value": "fade-in",
+          "label": "Fade-in"
+        },
+        {
+          "value": "fade-in-left",
+          "label": "Fade-in left"
+        },
+        {
+          "value": "fade-in-right",
+          "label": "Fade-in right"
+        },
+        {
+          "value": "fade-in-up",
+          "label": "Fade-in up"
+        },
+        {
+          "value": "fade-in-down",
+          "label": "Fade-in down"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "🖼 Layout"
+    },
+    {
+      "type": "range",
+      "id": "base_width",
+      "label": "Size",
+      "min": 70,
+      "max": 100,
+      "step": 5,
+      "default": 80,
+      "unit": "%"
+    },
+    {
+      "type": "text",
+      "id": "max_width",
+      "label": "Maximum width",
+      "placeholder": "eg. 1200px",
+      "info": "Sets width constraint for content."
+    },
+    {
+      "type": "range",
+      "id": "outer_margin",
+      "label": "Outer margin",
+      "info": "Only applies to top and bottom.",
+      "min": 0,
+      "max": 100,
+      "default": 0,
+      "step": 5,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "🚨 Advanced"
+    },
+    {
+      "type": "html",
+      "id": "custom_css",
+      "label": "CSS"
+    },
+    {
+      "type": "html",
+      "id": "mobile_custom_css",
+      "label": "Mobile CSS",
+      "info": "Applied on screens less than 480px."
+    },
+    {
+      "type": "checkbox",
+      "id": "override_theme_font",
+      "label": "Override default theme font",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "heading_font",
+      "label": "Heading",
+      "default": "serif"
+    },
+    {
+      "type": "font_picker",
+      "id": "main_font",
+      "label": "Text",
+      "default": "sans-serif"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "block",
+      "name": "Block",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "select",
+          "id": "image_crop",
+          "label": "Image aspect ratio",
+          "default": "2:3",
+          "options": [
+            {
+              "value": "4:3",
+              "label": "Landscape (4:3)"
+            },
+            {
+              "value": "2:3",
+              "label": "Portrait (2:3)"
+            },
+            {
+              "value": "1:1",
+              "label": "Square (1:1)"
+            },
+            {
+              "value": "none",
+              "label": "Original"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "focal_point",
+          "label": "Image focal point",
+          "info": "Used to keep the subject of your photo in view.",
+          "default": "center center",
+          "options": [
+            {
+              "value": "20% 0",
+              "label": "Top left"
+            },
+            {
+              "value": "top center",
+              "label": "Top center"
+            },
+            {
+              "value": "80% 0",
+              "label": "Top right"
+            },
+            {
+              "value": "20% 50%",
+              "label": "Left"
+            },
+            {
+              "value": "center center",
+              "label": "Center"
+            },
+            {
+              "value": "80% 50%",
+              "label": "Right"
+            },
+            {
+              "value": "20% 100%",
+              "label": "Bottom left"
+            },
+            {
+              "value": "bottom center",
+              "label": "Bottom center"
+            },
+            {
+              "value": "80% 100%",
+              "label": "Bottom right"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "id": "vertical_text",
+          "label": "Vertical text",
+          "default": "FASHION"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Latest Collection"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Lorem, ipsum dolor sit amet consectetur adipisicing, elit. Exercitationem excepturi doloribus qui itaque quaerat eaque quisquam at alias soluta ipsa! Dolores.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Link text",
+          "default": "Shop now"
+        },
+        {
+          "type": "url",
+          "id": "button_link",
+          "label": "Button link"
+        },
+        {
+          "type": "header",
+          "content": "🎨 Design"
+        },
+        {
+          "type": "color",
+          "id": "vertical_text_color",
+          "label": "Vertical text",
+          "default": "#FFFFFF"
+        },
+        {
+          "type": "color",
+          "id": "image_overlay_color",
+          "label": "Image overlay",
+          "default": "#000000"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Image with text - detail 🎒",
+      "settings": {
+      },
+      "blocks": [
+        {
+          "type": "block",
+          "settings": {
+          }
+        },
+        {
+          "type": "block",
+          "settings": {
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+{%- comment -%} JSON Settings {%- endcomment -%}
+<script type="application/json" data-dsgn-pck="{{ section.id }}">
+  {
+    "id": {{ section.id | json }},
+    "animation": {{ section.settings.animation | json }}
+  }
+</script>
+
+{%- comment -%} JavaScript {%- endcomment -%}
+<script data-dsgn-pck-js="{{ section.id }}">
+(function(){
+
+  const designPack = {
+    settings: {},
+    animateSection: function(entries, observer){
+      // Target the first entry available.
+      let observedSection = entries[0];
+      if (observedSection.isIntersecting) {
+        observedSection.target.classList.add('dsgn-pck__animation-applied');
+      }
+    },
+    load: function(section){
+
+      if (this.settings.animation !== 'none'){
+        const options = {
+          root: null,
+          rootMargin: '0px',
+          threshold: 0
+        };
+        // Construct Intersection Observer.
+        const observer = new IntersectionObserver( this.animateSection, options );
+        // Observe if element is present.
+        if (section) {
+          observer.observe(section);
+        }
+      }
+    },
+    unload: function(section){
+      section.classList.remove('dsgn-pck__animation-applied')
+    }
+  }
+
+  window.addEventListener('shopify:section:unload', function (e) {
+    const settings = document.querySelector(`[data-dsgn-pck="${e.detail.sectionId}"]`);
+    const sectionId = e.detail.sectionId;
+    const section = document.querySelector(`#DP--${e.detail.sectionId}`);
+    if (sectionId == designPack.settings.id){
+      designPack.unload(section);
+    }
+  });
+
+  designPack.settings = JSON.parse(document.querySelector('[data-dsgn-pck="{{ section.id }}"]').innerHTML);
+  const sectionId = {{ section.id | json }};
+  const section = document.querySelector(`#DP--${sectionId}`);
+
+  if (sectionId == designPack.settings.id){
+    designPack.load(section);
+  }
+})()
+</script>

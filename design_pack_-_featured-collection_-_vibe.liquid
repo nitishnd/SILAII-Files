@@ -1,0 +1,743 @@
+{%- comment -%}
+{
+  "pack_name": "Collection - lattice",
+  "pack_author": "Design Packs",
+  "license": "© Design Packs. All rights reserved. This code is protected by copyright law and may not be reproduced, distributed, or used without explicit permission from the author. Shopify complies with the Digital Millennium Copyright Act (DMCA) and responds to claims of copyright infringement using DMCA procedures, which could result in the termination of your Shopify account.",
+}
+{%- endcomment -%}
+
+{% comment %} Security Code - hides section when app uninstalled {% endcomment %}
+{%- unless content_for_header contains 'design_packs_file.js' -%}
+  {%- if request.design_mode -%}
+    <div class="dsgn-pck__no-app-warning">
+      <div class="dsgn-pck__no-app-warning-background">
+      </div>
+      <div class="dsgn-pck__no-app-warning-text dsgn-pck__rte">
+        <p><strong>WARNING!</strong> This premium section will not display properly without an active subscription for <a href="https://apps.shopify.com/design-packs" target="_blank" rel="noopener nofollow">Design Packs</a>. If you need any support please email <a href="mailto:info@design-packs.com" target="_blank" rel="noopener">info@design-packs.com</a> with your questions.</p>
+      </div>
+    </div>
+  {%- endif -%}
+  {%- break -%}
+{%- endunless -%}
+
+{%- comment -%} Assign: Preview section js fix {%- endcomment -%}
+{%- assign section_id = section.id | replace: '+', '' | replace: '=', '' -%}
+
+{% comment %} Content: check whether to automatically pull content {% endcomment %}
+{%- assign collection = section.settings.collection | default: collection | default: collections["all"] -%}
+
+{%- comment -%} Images: check image crop aspect ratio {%- endcomment -%}
+{%- assign image_crop_width = section.settings.image_crop | split: ':' | first | times: 1000 -%}
+{%- assign image_crop_height = section.settings.image_crop | split: ':' | last | times: 1000 -%}
+
+{% comment %} Images: responsive image widths {% endcomment %}
+{%- assign widths = '180, 360, 540, 720, 900, 1080, 1296, 1512, 1728, 1950, 2100, 2260, 2450, 2700, 3000, 3350, 3750, 4100' -%}
+
+{%- comment -%} Layout: has user entered measurement value into max-width field? {%- endcomment -%}
+{%- if section.settings.max_width contains 'px' or section.settings.max_width contains '%' -%}
+  {%- assign max_width = section.settings.max_width -%}
+{%- else -%}
+  {%- assign max_width = section.settings.max_width | append: 'px' -%}
+{%- endif -%}
+
+{% comment %} Metafields: hide section if there is no content {% endcomment %}
+{%- if section.settings.collection == blank and section.settings.product_list.count == 0 and section.settings.enable_metafield_detect == true -%}
+  <style>
+    .DP--{{ section_id }} {
+      display: none;
+    }
+  </style>
+  {%- break -%}
+{%- endif -%}
+
+{%- comment -%} Text: custom font_picker values {%- endcomment -%}
+{%- capture font_settings_list -%}
+{{ section.settings.main_font | font_face: font_display: 'block' }}~
+{{ section.settings.main_font | font_modify: 'weight', 'bolder' | font_face: font_display: 'block' }}~
+{{ section.settings.main_font | font_modify: 'style', 'italic' | font_face: font_display: 'block' }}~
+{{ section.settings.main_font | font_modify: 'style', 'italic' | font_modify: 'weight', 'bolder' | font_face: font_display: 'block' }}
+{%- endcapture -%}
+{%- assign font_array = font_settings_list | split: '~' -%}
+
+{%- comment -%} CSS {%- endcomment -%}
+<style>
+{%- if section.settings.override_theme_font != blank -%}
+  {%- for font in font_array -%}
+    {%- unless font contains 'error' -%}{{ font }}{%- endunless -%}
+  {%- endfor -%}
+  .DP--{{ section_id }} {
+    --main-font: {{ section.settings.main_font.family }}, {{ section.settings.main_font.fallback_families }};
+    --main-font-weight: {{ section.settings.main_font.weight }};
+    --main-font-style: {{ section.settings.main_font.style }};
+  }
+{%- endif -%}
+
+.DP--{{ section_id }} {
+  pointer-events: all;
+  color: {{ section.settings.text_color }};
+  background: {{ section.settings.background_color }};
+}
+
+.DP--{{ section_id }} a {
+  cursor: pointer;
+  color: {{ section.settings.text_color }};
+}
+
+.DP--{{ section_id }} .dsgn-pck__collection-grid {
+  display:  grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  grid-gap: 1px;
+  padding: 0;
+  margin-top: 0;
+}
+
+.DP--{{ section_id }} .dsgn-pck__product {
+  list-style: none;
+	padding: 50px;
+  margin-bottom: 0;
+	transition: 0.3s;
+  background: {{ section.settings.background_color }};
+  outline: 1px solid {{ section.settings.text_color }};
+}
+
+.DP--{{ section_id }} .dsgn-pck__product.big {
+	grid-area: span 2 / span 2;
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-card {
+  display: block;
+  width: 100%;
+  color: #333;
+  position: relative;
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-title__wrapper {
+  position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 100;
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-title {
+  color: {{ section.settings.text_color }};
+	{%- if section.settings.override_theme_font != blank -%}
+    font-family: var(--main-font);
+    font-weight: var(--main-font-weight);
+    font-style: var(--main-font-style);
+  {%- endif -%}
+	font-size: clamp(14px, {{ section.settings.text_size | times: 0.018 }}em, 48px);
+}
+
+.DP--{{ section_id }} .dsgn-pck__image__wrapper img {
+  object-fit: cover;
+  {%- if section.settings.image_crop == 'none' -%}
+    object-fit: contain;
+  {%- endif -%}
+}
+
+.DP--{{ section_id }} .dsgn-pck__editorial-image {
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-image: var(--background-image);
+}
+
+.DP--{{ section_id }} .dsgn-pck__editorial {
+  grid-column-start: var(--desktop-col-start);
+  grid-column-end: var(--desktop-col-width);
+  grid-row-start: var(--desktop-row-start);
+  grid-row-end: var(--desktop-row-height);
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+.DP--{{ section_id }} .dsgn-pck__editorial-content {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 1.5em;
+  font-size: 14px;
+}
+
+.DP--{{ section_id }} .dsgn-pck__editorial-inner-content {
+  padding: 100px 50px;
+}
+
+.DP--{{ section_id }} .dsgn-pck__text {
+  color: {{ section.settings.text_color }};
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--main-font);
+  font-weight: var(--main-font-weight);
+  font-style: var(--main-font-style);
+  {%- endif -%}
+  font-size: clamp(10px, {{ section.settings.text_size | times: 0.01 }}em, 36px);
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-tag {
+  text-transform: uppercase;
+  margin-top: 8px;
+  color: {{ section.settings.text_color }};
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--main-font);
+  font-weight: var(--main-font-weight);
+  font-style: var(--main-font-style);
+  {%- endif -%}
+  font-size: clamp(10px, {{ section.settings.text_size | times: 0.008 }}em, 36px);
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-card__image {
+  position: relative;
+  display: block;
+  margin-bottom: 0;
+  z-index: 0;
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-card__image.dsgn-pack__secondary-image--true:hover .dsgn-pck__product-image__second {
+  opacity: 1;
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-card__image.dsgn-pack__secondary-image--true:hover .dsgn-pck__product-image__first {
+  opacity: 0;
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-image__first {
+  position: relative;
+  transition: opacity .2s ease-in-out;
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-image__second {
+  opacity: 0;
+  z-index: 1;
+  position: absolute;
+  transition: opacity .2s ease-in-out;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-card__info {
+    position: relative;
+    z-index: 1;
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--main-font);
+  font-weight: var(--main-font-weight);
+  font-style: var(--main-font-style);
+  {%- endif -%}
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-card__info-content {
+  {%- unless section.settings.show_product_info_hover -%}
+  text-align: center;
+  padding: 5px 20px;
+  {%- endunless -%}
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-card__info p {
+  color: {{ section.settings.text_color }};
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: clamp(12px, {{ section.settings.text_size | times: 0.008 }}em, 36px);
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-card:hover  .dsgn-pck__product-card__info  {
+  opacity: 1;
+  z-index: 1;
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-card__info  a {
+  transition: 0.3s;
+  text-decoration: none;
+}
+
+.DP--{{ section_id }} .dsgn-pck__product-card__info  a:hover {
+  text-decoration: underline;
+}
+
+
+.DP--{{ section_id }} .dsgn-pck__product .dsgn-pck__product-money_was-price {
+  text-decoration: line-through;
+  color: {{ section.settings.text_color }};
+}
+
+.DP--{{ section_id }} .dsgn-pck__product .dsgn-pck__product-variant-info{
+  margin-top: 20px;
+}
+
+.DP--{{ section_id }} .dsgn-pck__product .dsgn-pck__product-variant-info a:hover{
+  text-decoration: underline;
+}
+
+.DP--{{ section_id }} .dsgn-pck__pagination {
+  text-align: center;
+  padding-top: 1.5rem;
+  padding-bottom: 3em;
+  {%- if section.settings.override_theme_font != blank -%}
+  font-family: var(--main-font);
+  font-weight: var(--main-font-weight);
+  font-style: var(--main-font-style);
+  {%- endif -%}
+  font-size: clamp(12px, {{ section.settings.text_size | times: 0.005 }}em, 48px);
+}
+
+.DP--{{ section_id }} .dsgn-pck__pagination .page {
+  padding: 0.5em 1em;
+  margin: 0 auto;
+  transition: 0.3s;
+  display: inline-block;
+  border-bottom: 1px solid transparent;
+}
+
+.DP--{{ section_id }} .dsgn-pck__pagination .page:hover {
+  border-bottom: 1px solid;
+  font-style: italic;
+}
+
+.DP--{{ section_id }} .dsgn-pck__pagination .prev,
+.DP--{{ section_id }} .dsgn-pck__pagination .next {
+  padding: 0.5em 1em;
+}
+
+.DP--{{ section_id }} .dsgn-pck__pagination .prev a,
+.DP--{{ section_id }} .dsgn-pck__pagination .next a,
+.DP--{{ section_id }} .dsgn-pck__pagination .page a {
+  text-decoration: none;
+  color: {{ section.settings.text_color }};
+}
+
+.DP--{{ section_id }} .dsgn-pck__pagination .current {
+  border-bottom: 1px solid ;
+  font-style: italic;
+}
+
+/* Animation */
+{%- if section.settings.animation != 'none' -%}
+  .DP--{{ section_id }} .dsgn-pck__grid.dsgn-pck__animation-applied [style*="--dsgn-pck-animate"] {
+    animation-name: dsgn-pck__animation--{{ section.settings.animation }};
+  }
+{%- else -%}
+  .DP--{{ section_id }} [style*="--dsgn-pck-animate"] {
+    opacity: 1;
+  }
+{% endif %}
+
+.DP--{{ section_id }} .dsgn-pck__sizer {
+  padding-top: {{ section.settings.inner_padding }}px;
+  padding-bottom: {{ section.settings.inner_padding }}px;
+  width: {{ section.settings.base_width }}%;
+  max-width: {{ max_width }};
+}
+
+{%- if section.settings.custom_css != blank -%}
+  {%- assign custom_section_declarations = section.settings.custom_css | split: '}' -%}
+  {%- for declaration in custom_section_declarations -%}
+    {%- if declaration contains '{' -%}
+      #DP--{{ section_id }} {{ declaration }} }
+    {%- endif -%}
+  {%- endfor -%}
+{%- endif -%}
+
+/* Large desktop */
+@media (min-width: 1200px) {
+
+}
+
+/* Portrait tablet to landscape and desktop */
+@media (min-width: 768px) and (max-width: 979px) {
+
+}
+
+/* Landscape phone to portrait tablet */
+@media (max-width: 767px) {
+  .DP--{{ section_id }} .dsgn-pck__collection-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+
+  .DP--{{ section_id }} .dsgn-pck__editorial {
+    width: 100%;
+    position: relative;
+    grid-column-end: span 1;
+    grid-column-start: var(--mobile-col-start);
+    grid-row-start: var(--mobile-row);
+    grid-row-end: var(--mobile-row-height);
+  }
+
+  .DP--{{ section_id }} .dsgn-pck__editorial-content  {
+    padding: 0;
+  }
+
+  .DP--{{ section_id }} .dsgn-pck__editorial-inner-content {
+    padding: 24px 24px;
+  }
+
+  .DP--{{ section_id }} .dsgn-pck__editorial-image {
+    background-image: var(--background-mobile-image);
+  }
+
+}
+
+/* Landscape phones and down */
+@media (max-width: 480px) {
+  .DP--{{ section_id }} .dsgn-pck__page-header {
+    padding-bottom: 0;
+  }
+
+	.DP--{{ section_id }} .dsgn-pck__product {
+		padding: 20px;
+	}
+
+  .DP--{{ section_id }} .dsgn-pck__sizer {
+    min-width: 70%;
+    padding-top: {{ section.settings.inner_padding | divided_by: 2 }}px;
+    padding-bottom: {{ section.settings.inner_padding | divided_by: 2 }}px;
+  }
+
+  {%- if section.settings.mobile_custom_css != blank -%}
+    {%- assign mobile_custom_declarations = section.settings.mobile_custom_css | split: '}' -%}
+    {%- for declaration in mobile_custom_declarations -%}
+      {%- if declaration contains '{' -%}
+        #DP--{{ section_id }} {{ declaration }} }
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+
+  .DP--{{ section_id }} .dsgn-pck__product-card__info p {
+    margin-top: 2px;
+    margin-bottom: 2px;
+    font-size: clamp(12px, {{ section.settings.text_size | times: 0.006 }}em, 36px);
+  }
+
+}
+
+</style>
+
+{%- if collection == blank -%}
+  <div class="dsgn-pck__justify-center">
+    <p>Please choose collection to display content.</p>
+  </div>
+  {%- break -%}
+{%- endif -%}
+
+{%- comment -%} HTML {%- endcomment -%}
+<section id="DP--{{ section_id }}" class="DP--{{ section_id }} dsgn-pck__collection dsgn-pck__section {{ section.settings.custom_classes }}">
+  <div class="dsgn-pck__sizer">
+    {%- if section.settings.anchor_id != blank -%}
+      <div id="{{ section.settings.anchor_id | remove: '#' | handleize }}" class="dsgn-pck__anchor-id" style="height: 0; overflow: hidden;"></div>
+    {%- endif -%}
+
+    {%- if template.name == 'collection' and section.settings.collection == blank and section.settings.product_list.count == 0 -%}
+      {%- assign paginate_count = section.settings.products_per_page -%}
+    {%- else -%}
+      {%- assign paginate_count = 9999 -%}
+      {%- assign limit = section.settings.products_per_page -%}
+    {%- endif -%}
+
+    {%- if section.settings.product_list.count > 0 -%}
+      {%- assign collection_array = section.settings.product_list | compact -%}
+    {%- else -%}
+      {%- assign collection_array = collection.products -%}
+    {%- endif -%}
+
+    {% paginate collection.products by paginate_count %}
+  <ul class="dsgn-pck__collection-grid">
+    {% for product in collection_array limit: limit %}
+
+    {%- comment -%} Crop based on initial image width and height{%- endcomment -%}
+    {%- if section.settings.image_crop == 'none' -%}
+      {%- assign image_crop_width = product.featured_image.width | default: '1000' -%}
+      {%- assign image_crop_height = product.featured_image.height | default: '1200' -%}
+    {%- endif -%}
+
+      <li class="dsgn-pck__product {% cycle 'big', '', '', '', '', '', '', 'big', '', '', '', '' %}" >
+        <div class="dsgn-pck__product-card">
+          <a class="dsgn-pck__product-card__image {% if product.images[1] != blank %}dsgn-pack__secondary-image--true{% endif %}" href="{{ product.url }}">
+            {%- if product.featured_image != blank -%}
+              <div class="dsgn-pck__product-image__first ">
+                <div class="dsgn-pck__image__wrapper">
+                  <svg class="dsgn-pck__svg-sizer" viewBox="0 0 {{ image_crop_width }} {{ image_crop_height }}"></svg>
+                  {{ product.featured_image | image_url: width: 2800 | image_tag:  widths: widths, sizes: '(max-width: 480px) 70vw, 33vw' }}
+                </div>
+              </div>
+            {%- endif -%}
+						{%- if product.images[1] != blank -%}
+							<div class="dsgn-pck__product-image__second">
+								<div class="dsgn-pck__image__wrapper">
+									<svg class="dsgn-pck__svg-sizer" viewBox="0 0 {{ image_crop_width }} {{ image_crop_height }}"></svg>
+									{{ product.images[1] | image_url: width: 2800 | image_tag:  sizes: '(max-width: 480px) 70vw, 33vw' }}
+								</div>
+							</div>
+						{%- endif -%}
+          </a>
+          <div  class="dsgn-pck__product-card__info {% if product.compare_at_price_max > product.price %}dsgn-pck__product-card--sale{%- endif -%}">
+            <a href="{{ product.url }}" class="dsgn-pck__product-card__info-wrapper">
+              <div class="dsgn-pck__product-card__info-content">
+							{%- if section.settings.show_product_label -%}
+                {%- if product.available != true -%}
+                  <div class="dsgn-pck__product-tag dsgn-pck__product-tag--sold-out">
+                  {{ 'sold_out' | t }}
+                  </div>
+                {%- endif -%}
+                {% comment %} Check if product is on sale {% endcomment %}
+                {% if product.available and product.compare_at_price_max > product.price %}
+                  <div class="dsgn-pck__product-tag dsgn-pck__product-tag--sale">
+                  {{ 'sale' | t }}
+                  </div>
+                {% endif %}
+              {%- endif -%}
+							{%- if section.settings.show_product_title -%}
+								<p class="dsgn-pck__product-title">{{ product.title }}</p>
+							{%- endif -%}
+
+              {%- if section.settings.show_product_price -%}
+                {%- liquid
+
+                  assign price = product.price | default: 1999
+                  assign money_price = price | money
+                  if settings.currency_code_enabled
+                    assign money_price = price | money_with_currency
+                  endif
+
+                  if product.price_varies
+                    assign money_price = 'from_price_html' | t: price: money_price
+                  endif
+                -%}
+
+                <p class="dsgn-pck__product-money">
+                  {{ money_price }}
+                {% if product.compare_at_price_max > product.price and product.price_varies == false %}
+                  <span class="dsgn-pck__product-money_was-price">
+                    <span class="money">
+                      {% if settings.currency_code_enabled %}
+                          {{ product.compare_at_price_max | money_with_currency }}
+                        {% else %}
+                          {{ product.compare_at_price_max | money }}
+                        {% endif %}
+                    </span>
+                  </span>
+                {% endif %}
+              </p>
+              {%- endif -%}
+              </div>
+            </a>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% if paginate.pages > 1  and template.name == 'collection' and section.settings.collection == blank %}
+      <div class="dsgn-pck__pagination">
+        {{ paginate | default_pagination | replace: '&laquo; Previous', '&larr;' | replace: 'Next &raquo;', '&rarr;' }}
+      </div>
+    {% endif %}
+  {% endpaginate %}
+
+  </div>
+
+</section>
+
+{% schema %}
+{
+  "name": "Collection - vibe",
+  "class": "DP__featured-collection-vibe",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "product_list",
+      "id": "product_list",
+      "label": "Product list",
+      "info": "Will override collection setting."
+    },
+    {
+      "type": "header",
+      "content": "Product grid"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Visible products",
+      "info": "Products per page when added to collection template",
+      "min": 1,
+      "max": 50,
+      "step": 1,
+      "default": 7
+    },
+    {
+      "type": "select",
+      "id": "image_crop",
+      "label": "Image aspect ratio",
+      "default": "4:3",
+      "options": [
+        {
+          "value": "4:3",
+          "label": "Landscape (4:3)"
+        },
+        {
+          "value": "2:3",
+          "label": "Portrait (2:3)"
+        },
+        {
+          "value": "1:1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "none",
+          "label": "Original"
+        }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_title",
+      "label": "Show product title",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_price",
+      "label": "Show price",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_label",
+      "label": "Show sold out or sale badge",
+      "info": "Sold out will only appear if no product availability",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "✏️ Text appearance"
+    },
+    {
+      "type": "range",
+      "id": "text_size",
+      "label": "Text size",
+      "min": 80,
+      "max": 150,
+      "step": 5,
+      "default": 100,
+      "unit": "%"
+    },
+    {
+      "type": "header",
+      "content": "🎨 Design"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#121212"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#FAF5ED"
+    },
+    {
+      "type": "header",
+      "content": "🖼 Layout"
+    },
+    {
+      "type": "range",
+      "id": "base_width",
+      "label": "Size",
+      "min": 60,
+      "max": 100,
+      "step": 5,
+      "default": 95,
+      "unit": "%"
+    },
+    {
+      "type": "text",
+      "id": "max_width",
+      "label": "Maximum width",
+      "placeholder": "eg. 1200px",
+      "info": "Sets width constraint for content.",
+      "default": "1000"
+    },
+    {
+      "type": "range",
+      "id": "inner_padding",
+      "label": "Inner padding",
+      "info": "Only applies to top and bottom.",
+      "min": 0,
+      "max": 100,
+      "default": 40,
+      "step": 5,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "🚨 Advanced"
+    },
+    {
+      "type": "liquid",
+      "id": "custom_css",
+      "label": "CSS"
+    },
+    {
+      "type": "liquid",
+      "id": "mobile_custom_css",
+      "label": "Mobile CSS",
+      "info": "Applied on screens less than 480px."
+    },
+    {
+      "type": "text",
+      "id": "anchor_id",
+      "label": "Link anchor id",
+      "placeholder": "#design-pack-section",
+      "info": "Enter a unique value to jump to this section from same page using a link or button. Eg. #design-pack-section [Learn more](https://app.gitbook.com/o/UwqKbTxsdQExehd4SSPM/s/iJpf70jLagzGk8zoz4fu/fundamentals/how-to-guides/how-to-jump-link-to-another-section-on-the-same-page)"
+    },
+    {
+      "type": "text",
+      "id": "custom_classes",
+      "label": "Custom classes",
+      "placeholder": "my-custom-class my-custom-class--2",
+      "info": "Add your own CSS classes to section. Eg. my-custom-class my-custom-class--2 [Learn more](https://design-packs.gitbook.io/docs/fundamentals/settings/custom-classes-setting)"
+    },
+    {
+      "type": "checkbox",
+      "id": "override_theme_font",
+      "label": "Override default theme font",
+      "default": false
+    },
+    {
+      "type": "font_picker",
+      "id": "main_font",
+      "label": "Text",
+      "default": "sans-serif"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_metafield_detect",
+      "label": "Enable metafield detection",
+      "default": false,
+      "info": "Hide section if content is not detected. [Learn more](https://design-packs.gitbook.io/docs/fundamentals/settings/enable-metafield-detection-setting)"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured collection - vibe 🎒"
+    }
+  ],
+  "locales": {
+    "en": {
+      "sold_out": "Sold Out",
+      "sale": "Sale",
+      "from_price_html": "from {{ price }}"
+    }
+  }
+}
+{% endschema %}
